@@ -1,2 +1,3 @@
-# monke-lang
-Go-based interpreter for a toy programming language
+# monke-lang 🐒
+## Under construction 🚧
+Go-based language interpreter for a toy programming language
