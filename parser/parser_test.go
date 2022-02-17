@@ -42,6 +42,40 @@ func TestLetStatements(t *testing.T) {
 	}
 }
 
+func TestReturnStatements(t *testing.T) {
+	input := `
+	return 5;
+	return 10;
+	return 978;
+	`
+
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 3 {
+		t.Fatalf("program.Statements does not return 3 statements. got=%d", len(program.Statements))
+	}
+
+	for _, stmt := range program.Statements {
+		// lets make sure this is a return statement by doing a type assertion.
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+
+		// not a return statement...
+		if !ok {
+			t.Errorf("stmt not *ast.returnStatement. got=%T", stmt)
+			continue
+		}
+
+		// Not the correct token
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("returnStmt.TokenLiteral not  'return', got=%q", returnStmt.TokenLiteral())
+		}
+	}
+}
+
 func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	// If not a let statement, throw err
 	if s.TokenLiteral() != "let" {
