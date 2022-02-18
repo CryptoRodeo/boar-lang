@@ -7,6 +7,11 @@ import (
 	"monkey/token"
 )
 
+// Prefix and infix parsing functions
+type (
+	prefixParseFn func() ast.Expression
+	infixParseFn  func(ast.Expression) ast.Expression
+)
 type Parser struct {
 	// pointer to an instance of the lexer
 	// used for calling NextToken() to get the next token in the input.
@@ -16,6 +21,16 @@ type Parser struct {
 	peekToken token.Token
 	// slice of error strings
 	errors []string
+
+	//parsing functions
+	/**
+		Note:
+		- Since we're using the Pratt Parser implementation it makes sense to use a map here.
+		- The token types are associated with a parsing function.
+		- Each token type can have up to two parsing functions associated with it, depending on its position (prefix / infix)
+	**/
+	prefixParseFns map[token.TokenType]prefixParseFn
+	infixParseFns  map[token.TokenType]infixParseFn
 }
 
 func New(l *lexer.Lexer) *Parser {
@@ -27,6 +42,14 @@ func New(l *lexer.Lexer) *Parser {
 	p.nextToken()
 
 	return p
+}
+
+func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
+	p.prefixParseFns[tokenType] = fn
+}
+
+func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
+	p.infixParseFns[tokenType] = fn
 }
 
 // Helper method to advance token pointers
