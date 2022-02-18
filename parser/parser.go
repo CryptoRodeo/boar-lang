@@ -65,16 +65,18 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
-	// investigate
+	// grabs the 'let' statement
 	stmt := &ast.LetStatement{Token: p.curToken}
-	// We expect to find an identifier
+	// We expect to find an identifier: let x, let a, let etc
 	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
 	// Construct an identifier node
+	// now we have let <identifier>
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
 	// We then expect to find an equal sign after the identifier
+	// ex: let <identifier> <assign>
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
@@ -83,7 +85,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	for !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
-
+	// let <identifier> <assign> <expression> ;
 	return stmt
 }
 
