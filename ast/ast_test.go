@@ -15,6 +15,7 @@ Notes:
 func TestString(t *testing.T) {
 	program := &Program{
 		// slice of statements
+		// test scenario: let myVar = anotherVar;
 		Statements: []Statement{
 			&LetStatement{
 				Token: token.Token{Type: token.LET, Literal: "let"},

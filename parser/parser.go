@@ -7,11 +7,33 @@ import (
 	"monkey/token"
 )
 
+/**
+- use iota to give the following constants incrementing numbers as values
+- the _ identifier takes the zero and the following constants get assigned
+  values 1 to x
+
+note:
+- the order of the relations between these constants matter.
+- it will allow us to answer questions regarding precedence
+ex: "does the * operator have a higher precedence than the == operator?"
+**/
+const (
+	_ int = iota
+	LOWEST
+	EQUALS      // ==
+	LESSGREATER // < or >
+	SUM         // +
+	PRODUCT     // *
+	PREFIX      // -X or !X
+	CALL        // myFunction(x)
+)
+
 // Prefix and infix parsing functions
 type (
 	prefixParseFn func() ast.Expression
 	infixParseFn  func(ast.Expression) ast.Expression
 )
+
 type Parser struct {
 	// pointer to an instance of the lexer
 	// used for calling NextToken() to get the next token in the input.
@@ -28,6 +50,7 @@ type Parser struct {
 		- Since we're using the Pratt Parser implementation it makes sense to use a map here.
 		- The token types are associated with a parsing function.
 		- Each token type can have up to two parsing functions associated with it, depending on its position (prefix / infix)
+		// key: tokenType, res: prefix/infix function
 	**/
 	prefixParseFns map[token.TokenType]prefixParseFn
 	infixParseFns  map[token.TokenType]infixParseFn
@@ -41,6 +64,12 @@ func New(l *lexer.Lexer) *Parser {
 	p.nextToken()
 	p.nextToken()
 
+	//Initialize the prefixParseFn map, register a parsing function for Identifiers.
+	// ex: x, foobar
+	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
+	//  if we encounter a token of type token.IDENT the parsing function to call is parseIdentifier
+	p.registerPrefix(token.IDENT, p.parseIdentifier)
+
 	return p
 }
 
@@ -50,6 +79,10 @@ func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
 
 func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 	p.infixParseFns[tokenType] = fn
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 }
 
 // Helper method to advance token pointers
@@ -83,7 +116,7 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
-		return nil
+		return p.parseExpressionStatement()
 	}
 }
 
@@ -119,6 +152,33 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	//TODO: we're skipping expressions until we encounter a semicolon.
 	for !p.curTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+	prefix := p.prefixParseFns[p.curToken.Type]
+
+	if prefix == nil {
+		return nil
+	}
+
+	leftExp := prefix()
+
+	return leftExp
+}
+
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{Token: p.curToken}
+	/*
+		Here we pass the lowest possible precedence to parseExpression, since
+		we didn't parse anything yet and we can't compare precedences.
+	*/
+	stmt.Expression = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 

@@ -117,8 +117,46 @@ func checkParserErrors(t *testing.T, p *Parser) {
 
 	t.Errorf("parser has %d errors", len(errors))
 
-	for _, msg := range errors {
-		t.Errorf("parser error: %q", msg)
+	for idx, msg := range errors {
+		t.Errorf("[%d] parser error: %q", idx, msg)
 	}
 	t.FailNow()
+}
+
+func TestIdentifierExpression(t *testing.T) {
+	input := "foobar;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+
+	checkParserErrors(t, p)
+
+	// This is really just one statement. foobar;
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. go=%d", len(program.Statements))
+	}
+
+	// Do a type inference on the first statement in our program
+	// make sure its an expression statement.
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement, got=%T", program.Statements[0])
+	}
+
+	// The statement should have an identifier: foobar
+	ident, ok := stmt.Expression.(*ast.Identifier)
+
+	if !ok {
+		t.Fatalf("exp not *ast.Identifier, got=%T", stmt.Expression)
+	}
+
+	if ident.Value != "foobar" {
+		t.Errorf("ident.Value not %s. got=%s", "foobar", ident.Value)
+	}
+
+	if ident.TokenLiteral() != "foobar" {
+		t.Errorf("ident.TokenLiteral not %s, got=%s", "foobar", ident.TokenLiteral())
+	}
 }
