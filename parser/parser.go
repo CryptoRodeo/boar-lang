@@ -5,6 +5,7 @@ import (
 	"monkey/ast"
 	"monkey/lexer"
 	"monkey/token"
+	"strconv"
 )
 
 /**
@@ -65,10 +66,12 @@ func New(l *lexer.Lexer) *Parser {
 	p.nextToken()
 
 	//Initialize the prefixParseFn map, register a parsing function for Identifiers.
-	// ex: x, foobar
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	//  if we encounter a token of type token.IDENT the parsing function to call is parseIdentifier
+	// ex: x, foobar => call parseIdentifier
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
+	// If we encounter a token of type token.INT, call parseIntegerLiteral
+	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 
 	return p
 }
@@ -99,10 +102,14 @@ func (p *Parser) ParseProgram() *ast.Program {
 	program.Statements = []ast.Statement{}
 
 	for !p.curTokenIs(token.EOF) {
+		// parse the current statement
 		stmt := p.parseStatement()
+
 		if stmt != nil {
+			// add the current statement to the program statements array
 			program.Statements = append(program.Statements, stmt)
 		}
+		// move onto the next token
 		p.nextToken()
 	}
 
@@ -116,6 +123,7 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
+		// by default we'll parse it as an expression: x, foobar, x + y, etc
 		return p.parseExpressionStatement()
 	}
 }
@@ -159,14 +167,15 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 }
 
 func (p *Parser) parseExpression(precedence int) ast.Expression {
+	// See if the current token is registered to a parsing function
 	prefix := p.prefixParseFns[p.curToken.Type]
 
 	if prefix == nil {
 		return nil
 	}
 
+	// If it is, return it.
 	leftExp := prefix()
-
 	return leftExp
 }
 
@@ -214,4 +223,20 @@ func (p *Parser) Errors() []string {
 func (p *Parser) peekError(t token.TokenType) {
 	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, p.peekToken.Type)
 	p.errors = append(p.errors, msg)
+}
+
+func (p *Parser) parseIntegerLiteral() ast.Expression {
+	lit := &ast.IntegerLiteral{Token: p.curToken}
+	// convert string into an int64
+	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
+
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	lit.Value = value
+
+	return lit
 }
