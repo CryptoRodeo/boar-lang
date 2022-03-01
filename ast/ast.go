@@ -5,17 +5,20 @@ import (
 	"monkey/token"
 )
 
-// Node for our AST
+// Node Interface for our AST
 type Node interface {
 	TokenLiteral() string //returns the literal value of the token its associated with
 	String() string       //for debugging and comparison
 }
 
+// Statements, a type of ndoe in our AST
 type Statement interface {
 	Node
 	statementNode()
 }
 
+// Expressions, AST Nodes that generate a value:
+// ex: let x = 6 doesn't produce a value, but 6 does (the value being 6)
 type Expression interface {
 	Node
 	expressionNode()

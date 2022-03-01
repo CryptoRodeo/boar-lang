@@ -72,6 +72,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	// If we encounter a token of type token.INT, call parseIntegerLiteral
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
+	// If we encounter a token of type BANG (!), call this function
+	p.registerPrefix(token.BANG, p.parsePrefixExpression)
+	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 
 	return p
 }
@@ -166,11 +169,19 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	return stmt
 }
 
+// Create an error when no prefix parse function has been found
+func (p *Parser) noPrefixParseFnError(t token.TokenType) {
+	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	p.errors = append(p.errors, msg)
+}
+
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	// See if the current token is registered to a parsing function
 	prefix := p.prefixParseFns[p.curToken.Type]
 
 	if prefix == nil {
+		// If its not, create an error
+		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
 
@@ -239,4 +250,30 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	lit.Value = value
 
 	return lit
+}
+
+// Parses expressions with prefixes: -5, !true, etc
+// anytime this function is called the tokens advance and the current token
+// is the one after the prefix operator
+func (p *Parser) parsePrefixExpression() ast.Expression {
+	// Create the prefix expression
+	expression := &ast.PrefixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+	}
+	// navigate to the next token
+	/**
+		Note:
+		- Unlike most parsing functions this one advances our tokens.
+		- The reason for this is because in order to correctly parse
+		  a prefix expression like -3 more than one token has to be "consumed".
+		- So after we grabe our current token (being the prefix) we advance the tokens
+		  and call parseExpression
+
+	**/
+	p.nextToken()
+	// Set the current token as the expressions "Right" value (value after prefix)
+	expression.Right = p.parseExpression(PREFIX)
+
+	return expression
 }
