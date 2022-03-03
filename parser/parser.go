@@ -272,7 +272,17 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 
 	**/
 	p.nextToken()
-	// Set the current token as the expressions "Right" value (value after prefix)
+	/*
+		Now that we have advanced the tokens, the next token will be the one after the prefix operator.
+		Take that token and set the current token as the prefix expressions "Right" value (value after prefix)
+
+		ex:
+		if we encounter '-5' when parseExpression is called then p.curToken.Type is token.INT.
+		parseExpression then checks the registered prefix parsing functions and finds its associated parsing function (parseIntegerLiteral).
+		This function builds the an *ast.IntergerLiteral node and returns it.
+
+		parseExpression returns this new node and uses it to fill the Right field of *ast.PrefixExpression
+	*/
 	expression.Right = p.parseExpression(PREFIX)
 
 	return expression
