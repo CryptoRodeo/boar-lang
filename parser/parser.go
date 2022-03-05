@@ -101,6 +101,14 @@ func New(l *lexer.Lexer) *Parser {
 
 	// Initialize the infix parse function map
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
+	p.registerInfix(token.PLUS, p.parseInfixExpression)
+	p.registerInfix(token.MINUS, p.parseInfixExpression)
+	p.registerInfix(token.SLASH, p.parseInfixExpression)
+	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
+	p.registerInfix(token.EQ, p.parseInfixExpression)
+	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
+	p.registerInfix(token.LT, p.parseInfixExpression)
+	p.registerInfix(token.GT, p.parseInfixExpression)
 
 	return p
 }
@@ -211,7 +219,9 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		return nil
 	}
 
-	// If it is, return it.
+	/**
+	prefix parsing function exists, call it, grab the value.
+	**/
 	leftExp := prefix()
 	return leftExp
 }
@@ -334,6 +344,28 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 		parseExpression returns this new node and uses it to fill the Right field of *ast.PrefixExpression
 	*/
 	expression.Right = p.parseExpression(PREFIX)
+
+	return expression
+}
+
+/**
+- Takes an ast.Expression argument as the 'left' side of the infix expression
+- Grabs the precedence of the current token (operator of the infix expression)
+- Advances the tokens, filling the Right field of the node
+**/
+func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
+	// Generate the infix expression struct
+	expression := &ast.InfixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+		Left:     left,
+	}
+	// Grab the precedence of the current token (the operator)
+	precedence := p.curPrecedence()
+	// Point to the next token
+	p.nextToken()
+	// Grab the expression on the right
+	expression.Right = p.parseExpression(precedence)
 
 	return expression
 }
