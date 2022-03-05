@@ -11,12 +11,17 @@ import (
 /**
 - use iota to give the following constants incrementing numbers as values
 - the _ identifier takes the zero and the following constants get assigned
-  values 1 to x
+values 1 to x
 
 note:
 - the order of the relations between these constants matter.
 - it will allow us to answer questions regarding precedence
 ex: "does the * operator have a higher precedence than the == operator?"
+
+TLDR:
+- these values will be used to identify the precedence of a token.
+- The values are incrementing, from 0 to X (so the order matters)
+- + has a lower precedence than *, etc.
 **/
 const (
 	_ int = iota
@@ -29,6 +34,13 @@ const (
 	CALL        // myFunction(x)
 )
 
+/**
+Precedence table.
+- associates token types with their precedence.
+ex:
+- token.PLUS and token.MINUS hae the same precedence
+- these tokens have a lower precedence than token.ASTERISK and token.SLASH
+**/
 var precedences = map[token.TokenType]int{
 	token.EQ:       EQUALS,
 	token.NOT_EQ:   EQUALS,
@@ -86,6 +98,9 @@ func New(l *lexer.Lexer) *Parser {
 	// If we encounter a token of type BANG (!), call this function
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
+
+	// Initialize the infix parse function map
+	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 
 	return p
 }
@@ -247,6 +262,10 @@ func (p *Parser) peekError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
+/**
+- Returns the precedence associated with the token type of p.peekToken
+- Defaults to LOWEST
+**/
 func (p *Parser) peekPrecedence() int {
 	if p, ok := precedences[p.peekToken.Type]; ok {
 		return p
@@ -255,6 +274,10 @@ func (p *Parser) peekPrecedence() int {
 	return LOWEST
 }
 
+/**
+- Returns the precedence associated with the token type of p.curToken
+- Defaults to LOWEST
+**/
 func (p *Parser) curPrecedence() int {
 	if p, ok := precedences[p.curToken.Type]; ok {
 		return p
