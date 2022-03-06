@@ -223,6 +223,24 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix parsing function exists, call it, grab the value.
 	**/
 	leftExp := prefix()
+	/*
+		find the infix parsing function for the next token (if it exists)
+		- If it finds a function, cal it and pass in the expression previously
+		returned by prefixParseFn (leftExp)
+		- Continue doing this until we encounter a token that has a higher precedence
+	*/
+	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
+		// grab the infix parsing function for this specific token
+		infix := p.infixParseFns[p.peekToken.Type]
+		// if no function exist (because its not an infix operator), return the leftExp
+		if infix == nil {
+			return leftExp
+		}
+		// else, traverse to the next token
+		p.nextToken()
+		// grab the value of the associated infix parsing function
+		leftExp = infix(leftExp)
+	}
 	return leftExp
 }
 
