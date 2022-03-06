@@ -135,9 +135,9 @@ func (p *Parser) nextToken() {
 func (p *Parser) ParseProgram() *ast.Program {
 	// pointer to the program
 	program := &ast.Program{}
-	// array of statements
+	// slice of statements
 	program.Statements = []ast.Statement{}
-
+	// Loop until we reach a null token / no token
 	for !p.curTokenIs(token.EOF) {
 		// parse the current statement
 		stmt := p.parseStatement()
@@ -230,28 +230,36 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		- Continue doing this until we encounter a token that has a higher precedence
 	*/
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
-		// grab the infix parsing function for this specific token
+		// grab the infix parsing function for this specific token (if it exists)
+		// ex: curToken => 5, peektoken => +
 		infix := p.infixParseFns[p.peekToken.Type]
 		// if no function exist (because its not an infix operator), return the leftExp
 		if infix == nil {
 			return leftExp
 		}
-		// else, traverse to the next token
+		/*
+			else, move to the next token (the infix operator).
+			this token wil lbe ued in the parseInfixExpression function
+		*/
 		p.nextToken()
-		// grab the value of the associated infix parsing function
+		/*
+			Pass the already parsed AST Expression Node to the parseInfixExpression function
+			so it can be assigned as its 'left' value.
+		*/
 		leftExp = infix(leftExp)
 	}
 	return leftExp
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	// Create an ExpressionStatement AST Node
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
 	/*
 		Here we pass the lowest possible precedence to parseExpression, since
 		we didn't parse anything yet and we can't compare precedences.
 	*/
 	stmt.Expression = p.parseExpression(LOWEST)
-
+	// If the next token is a semicolon, move onto the next token
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
@@ -378,11 +386,14 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 		Operator: p.curToken.Literal,
 		Left:     left,
 	}
-	// Grab the precedence of the current token (the operator)
+	/*
+		Grab the precedence of the current token (the operator)
+		before advancing the token pointers.
+	*/
 	precedence := p.curPrecedence()
 	// Point to the next token
 	p.nextToken()
-	// Grab the expression on the right
+	// Parse and grab the next AST Node
 	expression.Right = p.parseExpression(precedence)
 
 	return expression
