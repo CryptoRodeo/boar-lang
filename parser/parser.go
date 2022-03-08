@@ -224,10 +224,10 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	**/
 	leftExp := prefix()
 	/*
-		find the infix parsing function for the next token (if it exists)
-		- If it finds a function, cal it and pass in the expression previously
-		returned by prefixParseFn (leftExp)
+		- find the infix parsing function for the next token (if it exists)
+		- If it exists, call it, building up the Infix Expression Node
 		- Continue doing this until we encounter a token that has a higher precedence
+		than th eone passed or a semicolon
 	*/
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
 		// grab the infix parsing function for this specific token (if it exists)
@@ -245,6 +245,13 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		/*
 			Pass the already parsed AST Expression Node to the parseInfixExpression function
 			so it can be assigned as its 'left' value.
+
+			As this loop progresses leftExp will change and continue to get passed into the
+			parseInfixExpression function, building an expression of multiple, embedded infix expressions:
+			ex: 1 + 2 + 3 => ( (1+2) + 3 )
+			-> (1+2) being the first infix expression parsed
+			-> ( (1+2) + 3) being the final returned expression, where (1+2) is an infix expresssion
+			assigned to the 'left' value of the outer infix expression ((inner) + 3)
 		*/
 		leftExp = infix(leftExp)
 	}
