@@ -98,6 +98,8 @@ func New(l *lexer.Lexer) *Parser {
 	// If we encounter a token of type BANG (!), call this function
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
+	p.registerPrefix(token.TRUE, p.parseBoolean)
+	p.registerPrefix(token.FALSE, p.parseBoolean)
 
 	// Initialize the infix parse function map
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -181,9 +183,12 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
-	// Finally, lets skip the expression and stop when encountering a semicolon.
-	// TODO: we're skipping the expressions until we encounter a semicolon.
-	for !p.curTokenIs(token.SEMICOLON) {
+
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 	// let <identifier> <assign> <expression> ;
@@ -195,8 +200,9 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	// move up to the next token
 	p.nextToken()
 
-	//TODO: we're skipping expressions until we encounter a semicolon.
-	for !p.curTokenIs(token.SEMICOLON) {
+	stmt.ReturnValue = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -343,6 +349,10 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	lit.Value = value
 
 	return lit
+}
+
+func (p *Parser) parseBoolean() ast.Expression {
+	return &ast.Boolean{Token: p.curToken, Value: p.curTokenIs(token.TRUE)}
 }
 
 // Parses expressions with prefixes: -5, !true, etc
