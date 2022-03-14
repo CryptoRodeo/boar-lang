@@ -245,7 +245,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		value    interface{}
 	}{
 		{"!5;", "!", 5},
-		{"-15", "-", 15},
+		{"-15;", "-", 15},
 		{"!foobar;", "!", "foobar"},
 		{"-foobar;", "-", "foobar"},
 		{"!true;", "!", true},
@@ -382,6 +382,22 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 			"3 + 4 * 5 == 3 * 1 + 4 * 5",
 			"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
 		},
+		{
+			"true",
+			"true",
+		},
+		{
+			"false",
+			"false",
+		},
+		{
+			"3 > 5 == false",
+			"((3 > 5) == false)",
+		},
+		{
+			"3 < 5 == true",
+			"((3 < 5) == true)",
+		},
 	}
 
 	for _, tt := range tests {
@@ -407,6 +423,8 @@ func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{
 		return testIntegerLiteral(t, exp, v)
 	case string:
 		return testIdentifier(t, exp, v)
+	case bool:
+		return testBooleanLiteral(t, exp, v)
 	}
 	t.Errorf("type of exp not handled, got=%T", exp)
 	return false
@@ -429,6 +447,28 @@ func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, ope
 	}
 
 	if !testLiteralExpression(t, opExp.Right, right) {
+		return false
+	}
+
+	return true
+}
+
+func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
+	b, ok := exp.(*ast.Boolean)
+
+	if !ok {
+		t.Errorf("exp not *ast.Boolean, got=%T", exp)
+		return false
+	}
+
+	if b.Value != value {
+		t.Errorf("bo.Value not %t. got=%t", value, b.Value)
+		return false
+	}
+
+	if b.TokenLiteral() != fmt.Sprintf("%t", value) {
+		t.Errorf("bo.TokenLiteral not %t. got=%s",
+			value, b.TokenLiteral())
 		return false
 	}
 
