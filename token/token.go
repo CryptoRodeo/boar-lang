@@ -67,10 +67,31 @@ Checks the keywords table to see whether the given identifier in in fact a keywo
 
 -if it is, return the keywords TokenType constant.
 -if not, return token.IDENT, which is a TokenType for all user-defined identifiers
+
+note on go-lang specific syntax used here:
+
+if statements in Go can include both a condition and an initialization statement.
+The example above uses both:
+- initializes 'tok' with the value at keywords[ident];
+- also initializes 'ok', which recieves a bool that will be set to true/false if 'ident' is present in the map
+
+so if 'ident' is present in the map the body of the if statement will be executed and 'tok' will be available in the local scope.
 **/
 func LookupIdent(ident string) TokenType {
-	if tok, ok := keywords[ident]; ok { //investigate
+	if tok, ok := keywords[ident]; ok {
 		return tok
 	}
 	return IDENT
 }
+
+/**
+Dev Notes:
+
+Concepts:
+
+Tokens:
+- small, categorizable data structures that are fed into the parser
+
+Other:
+------------------------------
+**/

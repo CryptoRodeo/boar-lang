@@ -6,7 +6,18 @@ import (
 	"monkey/token"
 )
 
+/**
+A lexer's main job is to ... well,lex / do lexical analysis.
+It should transform source code into tokens via lexing
+
+Note:
+- Its job is _not_ to tell us if the code makes sense, has errors ,etc.
+_It should only turn inputs into tokens_
+
+So lets test that functionality here:
+**/
 func TestNextToken(t *testing.T) {
+	// source code input
 	input := `let five = 5;
 	let ten = 10;
 	let add = fn(x, y) {
@@ -27,7 +38,7 @@ func TestNextToken(t *testing.T) {
 	10 == 10; 
 	10 != 9;
 	`
-
+	// Lets make sure we get back the correct tokens based on our input.
 	tests := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
@@ -107,10 +118,11 @@ func TestNextToken(t *testing.T) {
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
-
+	// Create a new lexer
 	l := New(input)
 
 	for i, tt := range tests {
+		// look at the current char under examination (l.ch), return a token
 		tok := l.NextToken()
 
 		if tok.Type != tt.expectedType {

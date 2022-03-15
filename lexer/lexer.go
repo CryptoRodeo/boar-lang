@@ -6,7 +6,7 @@ import (
 
 //Struct to read "tokens"
 type Lexer struct {
-	input string // the entire string of characters that we've captured
+	input string // the entire string of characters that we've captured / 'source code'
 	// current position in input (points to current character) points to the char in the input that corresponds to ch byte.
 	position int
 	// current position in reading (after current character), points to the "next" character in the input
@@ -18,7 +18,7 @@ type Lexer struct {
 //Return a reference to a lexer struct value
 func New(input string) *Lexer {
 	// point to the new Lexer struct we're creating
-	// initialize that struct with the characters we want to parse
+	// initialize that struct with the source code we want to tokenize / lex
 	l := &Lexer{input: input}
 	// Lets make sure that our *Lexer is in a fully working state before anyone calls NextToken()
 	// with l.ch, l.position and l.readPosition already initialized.
@@ -27,9 +27,8 @@ func New(input string) *Lexer {
 }
 
 /**
-  Function for a lexer struct value
-
-	purpose: give us the next char and advance our position in the input string.
+	- give us the next char
+	- advances our position pointers used on the input string
 **/
 func (l *Lexer) readChar() {
 	// If we've reached the end of the input
@@ -47,17 +46,15 @@ func (l *Lexer) readChar() {
 }
 
 /**
-  Function for a Lexer struct value
-
-	returns: Token struct
+	returns: Token struct for the current char we're lexing
 
 	purpose:
-	- Look at the current character under examination by the lexer (l.ch) and return a token
+	- Look at the current character under examination by the lexer (l.ch) and return a token of a specific type,
 	depending on which character it is.
 **/
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
-	// Ignore any whitespace, it doesn't have any meaning.
+	// Ignore any whitespace found in the current char, (Monke-Lang doesn't add meaning to white spaces)
 	l.skipWhitespace()
 
 	// Read the char the lexer is currently on
@@ -80,7 +77,9 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.MINUS, l.ch)
 	case '!':
 		if l.peekChar() == '=' {
+			// save the ucrrent char so we don't lose it
 			ch := l.ch
+			// progress the position pointers
 			l.readChar()
 			tok = token.Token{Type: token.NOT_EQ, Literal: string(ch) + string(l.ch)}
 		} else {
@@ -107,10 +106,12 @@ func (l *Lexer) NextToken() token.Token {
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
 	case 0:
+		// reached EOF
 		tok.Literal = ""
 		tok.Type = token.EOF
 	default:
 		// This branch checks for identifiers whenever l.ch is not a recognized character.
+		// ex: this could be the 'x' in 'let x = 5;' or also the 5 in that statement
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
 			tok.Type = token.LookupIdent(tok.Literal)
@@ -138,22 +139,18 @@ func (l *Lexer) NextToken() token.Token {
 }
 
 /**
-  Function for a lexer struct
   Reads the identifier and advances the lexer's position until it encounters a non-letter character.
 **/
 func (l *Lexer) readIdentifier() string {
 	// position where we first encountered the potential identifier
 	position := l.position
-	// while the current character is a letter
+	// while the current character is a letter lets read each character and advance our lexers position
 	for isLetter(l.ch) {
-		/**
-			Lets read each character and advance our lexers position
-		**/
 		l.readChar()
 	}
 
-	// return the subset of the string at these positions
 	/*
+		return the subset of the string at these positions
 		position being the index of when we first found our identifier
 		l.position being the index right before we're no longer reading a character
 	*/
@@ -227,15 +224,42 @@ func (l *Lexer) peekChar() byte {
 }
 
 /**
-note:
+Dev Notes:
+
+Concepts:
+
+lexical analysis / lexing:
+------------------------------
+- Transforms source code to tokens via lexing / lexical analysis
+- This is what is being done in NextToken()
+
+Lexer:
+- what does the lexical anaylsis / lexing
+- Its job is not to tell us whether the code make sense, worse or contains error. It should only turn input into tokens
+
+Example of source code being lexed into tokens:
+
+input = "let x = 5 + 5;"
+
+result would look something like:
+[
+  LET,
+  IDENTIFIER("x"),
+  EQUAL_SIGN,
+  INTEGER(5),
+  PLUS_SIGN,
+  INTEGER(5),
+  SEMICOLON
+]
+
+
+Other:
+------------------------------
 - The lexer only supports ASCII characters instead of the full Unicode range.
 - This lets us keep things simple.
 - In order to fully support Unicode and UTF-8 we would need to:
   - change l.ch from a byte to a rune
 	- change the way we read the next characters, since they would be multiple bytes not.
-	- Using l.input[l.readPosition] wouldn't work anymore...
+	- Using l.input[l.readPosition] wouldn't work anymore..
 
-Go Pointers:
-- * operator, also termed as the dereferencing operator, is used to declare a pointer variable and access the value stored in the address.
-- & operator termed as address operator is used to return the (address of a variable or to access the address of a variable) to a pointer.
-**/
+	**/
