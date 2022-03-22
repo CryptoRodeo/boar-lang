@@ -91,7 +91,9 @@ Concepts:
 
 Tokens:
 - small, categorizable data structures that are fed into the parser
+- Used to construct the AST (abstract syntax tree)
 
 Other:
 ------------------------------
+- The lexer reads the source code and characterizes what it finds into tokens
 **/
