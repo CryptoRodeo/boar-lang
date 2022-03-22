@@ -38,7 +38,7 @@ const (
 Precedence table.
 - associates token types with their precedence.
 ex:
-- token.PLUS and token.MINUS hae the same precedence
+- token.PLUS and token.MINUS have the same precedence
 - these tokens have a lower precedence than token.ASTERISK and token.SLASH
 **/
 var precedences = map[token.TokenType]int{
@@ -52,7 +52,14 @@ var precedences = map[token.TokenType]int{
 	token.ASTERISK: PRODUCT,
 }
 
-// Prefix and infix parsing functions
+/**
+Prefix and infix parsing functions
+
+examples:
+prefix expression: --5,
+
+infix: a + b
+**/
 type (
 	prefixParseFn func() ast.Expression
 	infixParseFn  func(ast.Expression) ast.Expression
@@ -429,3 +436,65 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 
 	return exp
 }
+
+/**
+Dev Notes:
+
+Concepts:
+
+Parser:
+- A parser is a software component that takes input data (frequently text) and builds
+a data structure – often some kind of parse tree, abstract syntax tree or other
+hierarchical structure
+
+– This tree creates a structural representation of the input, checking for
+correct syntax in the process.
+
+- The parser is often preceded by a separate lexical analyser, which creates tokens
+from the sequence of input characters;
+
+TLDR: This is what parsers do: take source input (in our case tokens) and produce a data structure that represents source code
+
+Pratt Parsing:
+- The main idea is to associate parsing functions with token types
+- whenever a token type is encountered, the parsing functions are called to
+parse the appropriate expression and retur nan AST node that represents it.
+- each token type can have up to two parsing functions associated with it (prefx + infix),
+depending on its position
+
+Prefix operator:
+- an operator "in front" of its operand
+ex: --5
+
+here the operator is -- (decrement), the operand is the integer literal 5 and the operator is
+in the prefix position
+
+Postfix operator:
+- an operator "after" its operand.
+ex: 5++
+note: we won't have postfix operators in monke-lang (for now)
+
+Infix Operators:
+- when the operator sits between its operands
+ex: 5 + 5
+
+
+Other:
+------------------------------
+How this parser works:
+It repeatedly advances the tokens and checks the current token to decide what to do next:
+- either call another parsing function (prefix or infix)
+- throw an error.
+
+Each function then does its job and possibly constructs an AST node so that
+the “main loop” in parseProgram() can advance the tokens and decide what to do again.
+
+Parser approach:
+- This parser uses Top Down Operator Precedence Parsing (aka Vaughan Pratt Parsing)
+- This is different from Backus-Naur-Form parsing (which foxues on grammer rules)
+
+different how?
+- instead of associating parsing functions with grammer rules, Pratt parsing associates
+parsing functions with single token types (like we do here).
+- Each token type can have two parsing functions associates with it depending on the tokens position: infix or prefix
+**/
