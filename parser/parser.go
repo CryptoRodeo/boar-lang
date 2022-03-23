@@ -109,6 +109,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FALSE, p.parseBoolean)
 	// parse grouped expressions
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
+	// if expressions
+	p.registerPrefix(token.IF, p.parseIfExpression)
 
 	// Initialize the infix parse function map
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -298,7 +300,7 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
 }
 
 func (p *Parser) expectPeek(t token.TokenType) bool {
-	// CHeck the type of the next oken
+	// Check the type of the next token
 	if p.peekTokenIs(t) {
 		// If its correct, advance the tokens
 		p.nextToken()
@@ -435,6 +437,39 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 	}
 
 	return exp
+}
+
+func (p *Parser) parseIfexpression() ast.Expression {
+	expression := &ast.IfExpression{Token: p.curToken}
+
+	// we should expect a left parenthesis as the next token
+	// i.e. if ( x )
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	// progress tokens, parse expression
+	p.nextToken()
+	expression.Condition = p.parseExpression(LOWEST)
+
+	/**
+		Make sure we encounter a right parenthesis, progress tokens if we do
+		Then make sure we encounter a left brace {, progress tokens if we do
+
+		Note:
+		- A side effect of the expectPeek function is it progresses the tokens
+		if the condition is true.
+	**/
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	expression.Consequence = p.parseBlockStatement()
+
+	return expression
 }
 
 /**
