@@ -154,7 +154,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 		stmt := p.parseStatement()
 
 		if stmt != nil {
-			// add the current statement to the program statements array
+			// add the current statement to the program statements slice
 			program.Statements = append(program.Statements, stmt)
 		}
 		// move onto the next token
