@@ -439,7 +439,7 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 	return exp
 }
 
-func (p *Parser) parseIfexpression() ast.Expression {
+func (p *Parser) parseIfExpression() ast.Expression {
 	expression := &ast.IfExpression{Token: p.curToken}
 
 	// we should expect a left parenthesis as the next token
