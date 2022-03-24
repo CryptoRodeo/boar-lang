@@ -467,9 +467,29 @@ func (p *Parser) parseIfExpression() ast.Expression {
 		return nil
 	}
 
+	// The tokens get advanced enough so we are now sitting on the LBRACE
+
 	expression.Consequence = p.parseBlockStatement()
 
 	return expression
+}
+
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	block := &ast.BlockStatement{Token: p.curToken}
+	block.Statements = []ast.Statement{}
+
+	// Jump over the LBRACE token
+	p.nextToken()
+	// Continue parsing the statement until we reach the end of the block or token.EOF
+	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
+		p.nextToken()
+	}
+
+	return block
 }
 
 /**
