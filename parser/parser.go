@@ -471,11 +471,12 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
 	expression.Consequence = p.parseBlockStatement()
 
-	// Check if there is an 'else'
-
+	// At this point we should be sitting on the right brace }
+	// Check if there is an 'else', move up tokens if there is
 	if p.peekTokenIs(token.ELSE) {
+		// we're currently sisting on the 'else' token, move up the tokens
 		p.nextToken()
-		// If for some reason theres not a left brace immediately after the else
+		// If for some reason theres not a LBRACE token immediately after the else the expression is invalid
 		if !p.expectPeek(token.LBRACE) {
 			return nil
 		}
