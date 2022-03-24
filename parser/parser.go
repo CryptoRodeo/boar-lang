@@ -109,6 +109,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FALSE, p.parseBoolean)
 	// parse grouped expressions
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
+	// if expressions
+	p.registerPrefix(token.IF, p.parseIfExpression)
 
 	// Initialize the infix parse function map
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -154,7 +156,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 		stmt := p.parseStatement()
 
 		if stmt != nil {
-			// add the current statement to the program statements array
+			// add the current statement to the program statements slice
 			program.Statements = append(program.Statements, stmt)
 		}
 		// move onto the next token
@@ -298,7 +300,7 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
 }
 
 func (p *Parser) expectPeek(t token.TokenType) bool {
-	// CHeck the type of the next oken
+	// Check the type of the next token
 	if p.peekTokenIs(t) {
 		// If its correct, advance the tokens
 		p.nextToken()
@@ -435,6 +437,72 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 	}
 
 	return exp
+}
+
+func (p *Parser) parseIfExpression() ast.Expression {
+	expression := &ast.IfExpression{Token: p.curToken}
+
+	// we should expect a left parenthesis as the next token
+	// i.e. if ( x )
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	// progress tokens, parse expression
+	p.nextToken()
+	expression.Condition = p.parseExpression(LOWEST)
+
+	/**
+		Make sure we encounter a right parenthesis, progress tokens if we do
+		Then make sure we encounter a left brace {, progress tokens if we do
+
+		Note:
+		- A side effect of the expectPeek function is it progresses the tokens
+		if the condition is true.
+	**/
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	// The tokens get advanced enough so we are now sitting on the LBRACE
+
+	expression.Consequence = p.parseBlockStatement()
+
+	// At this point we should be sitting on the right brace }
+	// Check if there is an 'else', move up tokens if there is
+	if p.peekTokenIs(token.ELSE) {
+		// we're currently sisting on the 'else' token, move up the tokens
+		p.nextToken()
+		// If for some reason theres not a LBRACE token immediately after the else the expression is invalid
+		if !p.expectPeek(token.LBRACE) {
+			return nil
+		}
+
+		expression.Alternative = p.parseBlockStatement()
+	}
+
+	return expression
+}
+
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	block := &ast.BlockStatement{Token: p.curToken}
+	block.Statements = []ast.Statement{}
+
+	// Jump over the LBRACE token
+	p.nextToken()
+	// Continue parsing the statement until we reach the end of the block or token.EOF
+	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
+		p.nextToken()
+	}
+
+	return block
 }
 
 /**
