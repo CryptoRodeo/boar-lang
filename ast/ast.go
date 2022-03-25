@@ -13,6 +13,7 @@ type Node interface {
 }
 
 // Statements, a type of ndoe in our AST
+// Note: Statements do not generate values, expressions do.
 type Statement interface {
 	Node
 	statementNode()
@@ -124,6 +125,9 @@ func (es *ExpressionStatement) String() string {
 	return ""
 }
 
+// A statement that consists of only one expression
+// ex: let x = 5;
+// the expression here being 5 (which generates a value)
 type ExpressionStatement struct {
 	Token      token.Token
 	Expression Expression
@@ -235,10 +239,27 @@ func (bs *BlockStatement) String() string {
 	return out.String()
 }
 
+/**
+Function literals are Expressions.
+They can be used anywhere expressions are valid.
+
+ex:
+a function literal as the expression in a let statement:
+let someFunction = fn(x, y) { return x + y; }
+
+as the expression in a return statement inside another function literal:
+fn() {
+	return fn(y,z) { return y > x; }
+}
+
+as an argument when calling another function:
+outerFunc(a, b, fn(c, d) { return a > b; });
+
+**/
 type FunctionLiteral struct {
 	Token      token.Token
-	Parameters []*Identifier
-	Body       *BlockStatement
+	Parameters []*Identifier   // (x,y,z)
+	Body       *BlockStatement // { x + y; }, { foo > bar; }
 }
 
 func (fl *FunctionLiteral) expressionNode()
