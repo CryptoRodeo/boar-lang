@@ -3,19 +3,18 @@
 pipeline {
     agent any
 
-		stages {
+	stages {
         stage('Build') {
             steps {
                 echo 'Building...'
-								sh '/usr/local/go/bin/go build ./'
+                sh '    ./misc/build.sh'
             }
         }
+
         stage('Test') {
             steps {
                 echo 'Testing...'
-								sh '/usr/local/go/bin/go test ./parser'
-								sh '/usr/local/go/bin/go test ./lexer'
-								sh '/usr/local/go/bin/go test ./ast'
+                sh '    ./misc/test.sh'
             }
         }
     }
