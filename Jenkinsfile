@@ -8,15 +8,15 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building...'
-								sh go build .
+								sh 'go build ./'
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing...'
-								sh go test ./parser
-								sh go test ./lexer
-								sh go test ./ast
+								sh 'go test ./parser'
+								sh 'go test ./lexer'
+								sh 'go test ./ast'
             }
         }
     }
