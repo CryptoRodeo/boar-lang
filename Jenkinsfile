@@ -1,22 +1,21 @@
 #!/usr/bin/env groovy
 
 pipeline {
-
     agent any
 
 		stages {
         stage('Build') {
             steps {
                 echo 'Building...'
-								sh 'go build ./'
+								sh '/usr/local/go/bin/go build ./'
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing...'
-								sh 'go test ./parser'
-								sh 'go test ./lexer'
-								sh 'go test ./ast'
+								sh '/usr/local/go/bin/go test ./parser'
+								sh '/usr/local/go/bin/go test ./lexer'
+								sh '/usr/local/go/bin/go test ./ast'
             }
         }
     }
