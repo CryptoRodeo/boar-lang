@@ -7,14 +7,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building...'
-                sh '    ./misc/build.sh'
+                sh 'bash ./misc/build.sh'
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Testing...'
-                sh '    ./misc/test.sh'
+                sh 'bash ./misc/test.sh'
             }
         }
     }
