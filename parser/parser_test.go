@@ -668,7 +668,7 @@ func TestFunctionLiteralParsing(t *testing.T) {
 	x, y := function.Parameters[0], function.Parameters[1]
 
 	testLiteralExpression(t, x, "x")
-	testLiteralExpression(t, y, "x")
+	testLiteralExpression(t, y, "y")
 
 	// The body should only have 1 statement: x + y
 	if len(function.Body.Statements) != 1 {
