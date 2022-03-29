@@ -296,17 +296,17 @@ example: add(1,2) => fn(a,b) { a + b; }(1,2)
 **/
 
 type CallExpression struct {
-	Token token.Token // the '(' token
-	Function Expression // idenfifier or function literal
+	Token     token.Token // the '(' token
+	Function  Expression  // idenfifier or function literal
 	Arguments []Expression
 }
 
-func (ce *CallExpression) expressionNode() {}
-func (ce *CallExpression) TokenLiteral() string { reutrn ce.Token.Literal }
+func (ce *CallExpression) expressionNode()      {}
+func (ce *CallExpression) TokenLiteral() string { return ce.Token.Literal }
 func (ce *CallExpression) String() string {
 	var out bytes.Buffer
-	
-	args := []string {}
+
+	args := []string{}
 
 	for _, a := range ce.Arguments {
 		args = append(ars, a.String())
