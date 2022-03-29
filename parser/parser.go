@@ -534,6 +534,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 		return identifiers
 	}
 
+	// Move past the parenthesis we're currently on, point to the first identifier
 	p.nextToken()
 
 	// Grab first identifier
