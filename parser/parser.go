@@ -261,7 +261,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		}
 		/*
 			else, move to the next token (the infix operator).
-			this token wil lbe ued in the parseInfixExpression function
+			this token will be used in the parseInfixExpression function
 		*/
 		p.nextToken()
 		/*
@@ -562,10 +562,17 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	return identifiers
 }
 
-// recieves the already parsed function as argument, uses it to construct call expression node
+// recieves the already parsed function as argument, uses it to construct call expression node.
+// "leftExp" in parseExpressions gets passed to this infix parsing function
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	/*
+		p.curToken => left parenthesis
+		function => identifier (i.e.: add, subtract, doTheThing)
+	*/
 	exp := &ast.CallExpression{Token: p.curToken, Function: function}
+	// (x,y,z
 	exp.Arguments = p.parseCallArguments()
+
 	return exp
 }
 
@@ -586,7 +593,7 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 		p.nextToken()
 		args = append(args, p.parseExpression(LOWEST))
 	}
-
+	// At the end of the argument list we should see a right parenthesis / closing parenthesis
 	if !p.expectPeek(token.RPAREN) {
 		return nil
 	}
