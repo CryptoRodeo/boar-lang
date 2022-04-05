@@ -8,25 +8,9 @@ import (
 	"monkey/parser"
 )
 
-const PROMPT = ">> "
+const PROMPT = "~> "
 
-const BANANA = `
-                ██                                      
-              ██  ██                                    
-            ██  ░░░░██                                  
-          ██  ░░░░░░░░██                                
-          ██  ░░░░░░░░██                                
-          ██  ██░░██░░██                                
-          ██  ▓▓░░██░░██                                
-          ██  ██░░██░░██                                
-          ██  ░░░░░░░░██                                
-  ██    ████  ░░░░░░░░████    ██                        
-██░░██████  ░░░░██░░░░░░██████░░██                      
-██░░░░░░░░░░░░░░██░░░░░░░░░░░░░░██                      
-  ██░░░░░░░░░░██████░░░░░░░░░░██                        
-    ▓▓▓▓▓▓▓▓▓▓      ▓▓██▓▓▓▓▓▓                          
-
-`
+const BEAR = `ʕ•ᴥ•ʔ`
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
@@ -60,8 +44,8 @@ func Start(in io.Reader, out io.Writer) {
 }
 
 func printParserErrors(out io.Writer, errors []string) {
-	io.WriteString(out, BANANA)
-	io.WriteString(out, "Whoops, Parser slipped on some errors!\n")
+	io.WriteString(out, BEAR)
+	io.WriteString(out, "Hello friend, something went wrong\n")
 	io.WriteString(out, "Errors found:\n")
 	for _, msg := range errors {
 		io.WriteString(out, "\t"+msg+"\n")
