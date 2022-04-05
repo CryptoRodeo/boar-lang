@@ -40,4 +40,8 @@ eval()
 - should start at the top of the AST, recieving an *ast.Program and
   then traverse every node in it and evaluate every statement.
 
+self-evaluating expressions:
+- what we call literals
+- we input an integer into eval() and get that integer back (hence they evaluate themselves.)
+- we input an *ast.IntegerLiteral, eval() returns an *object.Literal with a Value of that integer
 **/
