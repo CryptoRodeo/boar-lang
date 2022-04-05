@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"monkey/evaluator"
 	"monkey/lexer"
 	"monkey/parser"
 )
@@ -24,11 +25,11 @@ func Start(in io.Reader, out io.Writer) {
 		if !scanned {
 			return
 		}
-		// The line we just read
+		// Grab the line we just read
 		line := scanner.Text()
 		// pass it through the lexer
 		l := lexer.New(line)
-		// pass lexed line through the parser
+		// pass lexer generated tokens to the parser
 		p := parser.New(l)
 		// parse the program
 		program := p.ParseProgram()
@@ -37,9 +38,14 @@ func Start(in io.Reader, out io.Writer) {
 			printParserErrors(out, p.Errors())
 			continue
 		}
-		//print the currently parsed program
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+
+		//print the currently evaluated program
+		evaluated := evaluator.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
+		}
+
 	}
 }
 
