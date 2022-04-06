@@ -7,6 +7,7 @@ import (
 	"monkey/evaluator"
 	"monkey/lexer"
 	"monkey/parser"
+	"os/user"
 )
 
 const PROMPT = "~> "
@@ -50,8 +51,14 @@ func Start(in io.Reader, out io.Writer) {
 }
 
 func printParserErrors(out io.Writer, errors []string) {
-	io.WriteString(out, BEAR)
-	io.WriteString(out, "Hello friend, something went wrong\n")
+	user, err := user.Current()
+
+	if err != nil {
+		panic(err)
+	}
+
+	io.WriteString(out, "\n"+BEAR+"\n")
+	io.WriteString(out, "psst, hey "+user.Username+", I think you broke something...\n")
 	io.WriteString(out, "Errors found:\n")
 	for _, msg := range errors {
 		io.WriteString(out, "\t"+msg+"\n")
