@@ -74,3 +74,22 @@ func testBooleanObject(t *testing.T, obj object.Object, expected bool) bool {
 
 	return true
 }
+
+func TestBangOperator(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{"!true", false},
+		{"!false", true},
+		{"!5", false},
+		{"!!true", true},
+		{"!!false", false},
+		{"!!", true},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testBooleanObject(t, evaluated, tt.expected)
+	}
+}
