@@ -81,6 +81,7 @@ func evalBangOperatorExpression(right object.Object) object.Object {
 	//!null
 	case NULL:
 		return TRUE
+	//!x, !5, etc.
 	default:
 		return FALSE
 	}
