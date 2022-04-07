@@ -94,7 +94,7 @@ func evalMinusOperatorExpression(right object.Object) object.Object {
 		return NULL
 	}
 
-	//extract value from *object.Integer
+	//extract value from *object.Integer via type assertion
 	value := right.(*object.Integer).Value
 	// return integer object with negated value
 	return &object.Integer{Value: -value}
