@@ -160,4 +160,12 @@ self-evaluating expressions:
 - what we call literals
 - we input an integer into eval() and get that integer back (hence they evaluate themselves.)
 - we input an *ast.IntegerLiteral, eval() returns an *object.Literal with a Value of that integer
+
+integer vs boolean comparison:
+- with this current implementation boolean comparison will always be faster than integer comparison
+- this is because with boolean comparisons we always use pointers to the two boolean object (TRUE, FALSE)
+- whereas with integers a new object.Integer has to be instantiated, creating new pointers
+- we cannot compare these pointers to different object.Integer instances, otherwise 7==7 would be false
+- this is also why integer operands have to be higher up in the switch statement check (see evalInfixExpression)
+- as long as we take care of the operand types before arriving at pointer comparisons this evaluation will work fine
 **/
