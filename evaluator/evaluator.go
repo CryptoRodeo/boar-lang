@@ -109,7 +109,10 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 	switch {
 	case bothAreIntegers(left, right):
 		return evalIntegerInfixExpression(operator, left, right)
-
+	case operator == "==":
+		return nativeBoolToBooleanObject(left == right)
+	case operator == "!=":
+		return nativeBoolToBooleanObject(left != right)
 	default:
 		return NULL
 	}
