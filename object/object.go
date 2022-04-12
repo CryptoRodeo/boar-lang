@@ -7,9 +7,10 @@ import (
 type ObjectType string
 
 const (
-	INTEGER_OBJ = "INTEGER"
-	BOOLEAN_OBJ = "BOOLEAN"
-	NULL_OBJ    = "NULL"
+	INTEGER_OBJ      = "INTEGER"
+	BOOLEAN_OBJ      = "BOOLEAN"
+	NULL_OBJ         = "NULL"
+	RETURN_VALUE_OBJ = "RETURN VALUE"
 )
 
 type Object interface {
@@ -51,11 +52,21 @@ func (n *Null) Inspect() string {
 	return "null"
 }
 
+type ReturnValue struct {
+	Value Object
+}
+
+func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
+func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
+
 /**
 Dev notes:
 - every value we encounter and evaluate will be represented using an Object interace
 - the reason for the interface is that every value needs a different internal representation
   and having different struct types makes it easier to define different values instead of trying to fit them
   all in the same struct field.
+
+  return values:
+  - just wrappers around another object.
 
 **/
