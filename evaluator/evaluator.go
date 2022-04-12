@@ -50,6 +50,10 @@ func Eval(node ast.Node) object.Object {
 	case *ast.IfExpression:
 		return evalIfExpression(node)
 
+	case *ast.ReturnStatement:
+		val := Eval(node.ReturnValue)
+		return &object.ReturnValue{Value: val}
+
 	}
 
 	return nil
@@ -60,6 +64,12 @@ func evalStatements(stmts []ast.Statement) object.Object {
 
 	for _, statement := range stmts {
 		result = Eval(statement)
+
+		// if we encounter a return value, immediately return the unwrapped value
+		// note: we don't return an object.ReturnValue when encountering it, only the value its wrapping
+		if returnValue, ok := result.(*object.ReturnValue); ok {
+			return returnValue.Value
+		}
 	}
 
 	return result
