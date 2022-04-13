@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"monkey/ast"
 	"monkey/object"
 )
@@ -36,12 +37,24 @@ func Eval(node ast.Node) object.Object {
 	case *ast.PrefixExpression:
 		// the operand
 		right := Eval(node.Right)
+		if isError(right) {
+			return right
+		}
 		// now evaluate the operand with the operator
 		return evalPrefixExpression(node.Operator, right)
 
 	case *ast.InfixExpression:
 		left := Eval(node.Left)
 		right := Eval(node.Right)
+
+		if isError(left) {
+			return left
+		}
+
+		if isError(right) {
+			return left
+		}
+
 		return evalInfixExpression(node.Operator, left, right)
 
 	case *ast.BlockStatement:
@@ -52,6 +65,9 @@ func Eval(node ast.Node) object.Object {
 
 	case *ast.ReturnStatement:
 		val := Eval(node.ReturnValue)
+		if isError(val) {
+			return val
+		}
 		return &object.ReturnValue{Value: val}
 
 	}
@@ -65,10 +81,14 @@ func evalProgram(stmts []ast.Statement) object.Object {
 	for _, statement := range stmts {
 		result = Eval(statement)
 
+		switch result := result.(type) {
 		// if we encounter a return value, immediately return the unwrapped value
 		// note: we don't return an object.ReturnValue when encountering it, only the value its wrapping
-		if returnValue, ok := result.(*object.ReturnValue); ok {
-			return returnValue.Value
+		case *object.ReturnValue:
+			return result.Value
+		// if we encounter an error, return immediately
+		case *object.Error:
+			return result
 		}
 	}
 
@@ -87,9 +107,9 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 	case "!":
 		return evalBangOperatorExpression(right)
 	case "-":
-		return evalMinusOperatorExpression(right)
+		return evalMinusPrefixOperatorExpression(right)
 	default:
-		return NULL
+		return newError("unknown operator: %s%s", operator, right.Type())
 	}
 }
 
@@ -110,9 +130,9 @@ func evalBangOperatorExpression(right object.Object) object.Object {
 	}
 }
 
-func evalMinusOperatorExpression(right object.Object) object.Object {
+func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	if right.Type() != object.INTEGER_OBJ {
-		return NULL
+		return newError("unknown operator: -%s", right.Type())
 	}
 
 	//extract value from *object.Integer via type assertion
@@ -129,8 +149,10 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 		return nativeBoolToBooleanObject(left == right)
 	case operator == "!=":
 		return nativeBoolToBooleanObject(left != right)
+	case left.Type() != right.Type():
+		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	default:
-		return NULL
+		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
 }
 
@@ -161,12 +183,16 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 	case "!=":
 		return nativeBoolToBooleanObject(leftVal != rightVal)
 	default:
-		return NULL
+		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
 }
 
 func evalIfExpression(ie *ast.IfExpression) object.Object {
 	condition := Eval(ie.Condition)
+
+	if isError(condition) {
+		return condition
+	}
 
 	if isTruthy(condition) {
 		return Eval(ie.Consequence)
@@ -197,12 +223,27 @@ func evalBlockStatement(block *ast.BlockStatement) object.Object {
 		result = Eval(statement)
 		// if the result is an *object.ReturnValue, return it without unwrapping its .Value
 		// and stop the execution in a potential outer block statement.
-		if result != nil && result.Type() == object.RETURN_VALUE_OBJ {
-			return result
+		if result != nil {
+			rt := result.Type()
+
+			if rt == object.RETURN_VALUE_OBJ || rt == object.ERROR_OBJ {
+				return result
+			}
 		}
 	}
 
 	return result
+}
+
+func newError(format string, a ...interface{}) *object.Error {
+	return &object.Error{Message: fmt.Sprintf(format, a...)}
+}
+
+func isError(obj object.Object) bool {
+	if obj != nil {
+		return obj.Type() == object.ERROR_OBJ
+	}
+	return false
 }
 
 /**
@@ -224,4 +265,7 @@ integer vs boolean comparison:
 - we cannot compare these pointers to different object.Integer instances, otherwise 7==7 would be false
 - this is also why integer operands have to be higher up in the switch statement check (see evalInfixExpression)
 - as long as we take care of the operand types before arriving at pointer comparisons this evaluation will work fine
+
+internal error handling:
+- in order to prevent errors from being passed around and bubbling up from their origin we check for errors whenever we call Eval inside of Eval
 **/
