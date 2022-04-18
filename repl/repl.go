@@ -6,6 +6,7 @@ import (
 	"io"
 	"monkey/evaluator"
 	"monkey/lexer"
+	"monkey/object"
 	"monkey/parser"
 	"os/user"
 )
@@ -16,6 +17,7 @@ const BEAR = `ʕ•ᴥ•ʔ`
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 
 	// Loop forever, until we exit
 	for {
@@ -41,7 +43,7 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		//print the currently evaluated program
-		evaluated := evaluator.Eval(program)
+		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
