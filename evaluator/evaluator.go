@@ -77,6 +77,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.FunctionLiteral:
 		params := node.Parameters
 		body := node.Body
+		// note: the env set here is the env/scope the function was defined in
 		return &object.Function{Parameters: params, Env: env, Body: body}
 
 	case *ast.CallExpression:
@@ -88,6 +89,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if len(args) == 1 && isError(args[0]) {
 			return args[0]
 		}
+
+		return applyFunction(function, args)
 
 	case *ast.IfExpression:
 		return evalIfExpression(node, env)
@@ -298,6 +301,53 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 		result = append(result, evaluated)
 	}
 	return result
+}
+
+func applyFunction(fn object.Object, args []object.Object) object.Object {
+	/**
+		- check if this object is a function
+		- convert it to a *object.Function reference (so we can access some fields)
+	**/
+	function, ok := fn.(*object.Function)
+
+	if !ok {
+		return newError("not a function => %s", fn.Type())
+	}
+	// create the inner function scope
+	extendedEnv := extendFunctionEnv(function, args)
+	//evalute the function body with the inner scope
+	evaluated := Eval(function.Body, extendedEnv)
+	// if the object has a return value, return that value
+	// else, return the object.
+	return unwrapReturnValue(evaluated)
+}
+
+func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Environment {
+	// create inner function scope
+	env := object.NewEnclosedEnvironment(fn.Env)
+	// bind the arguments used in the function call to the parameter names in that inner function scope
+	for idx, param := range fn.Parameters {
+		env.Set(param.Value, args[idx])
+	}
+
+	return env
+}
+
+/**
+returns the unwrapped *object.ReturnValue if it exists.
+This is necessary because:
+- otherwise a return statement would bubble up through several funcions
+  - this would stop the evaluation in all of them
+- we only want to stop the evaluation of the last called function's body
+
+This is why we need to unwrap it, so evalBlockStatement wont stop evaluating statements in outer functions.
+**/
+func unwrapReturnValue(obj object.Object) object.Object {
+	if returnValue, ok := obj.(*object.ReturnValue); ok {
+		return returnValue.Value
+	}
+
+	return obj
 }
 
 /**
