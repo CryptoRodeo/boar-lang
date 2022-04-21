@@ -336,7 +336,7 @@ func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Enviro
 /**
 returns the unwrapped *object.ReturnValue if it exists.
 This is necessary because:
-- otherwise a return statement would bubble up through several funcions
+- otherwise a return statement would bubble up through several functions
   - this would stop the evaluation in all of them
 - we only want to stop the evaluation of the last called function's body
 
