@@ -37,6 +37,9 @@ func TestNextToken(t *testing.T) {
 
 	10 == 10; 
 	10 != 9;
+
+	"foobar"
+	"foo bar"
 	`
 	// Lets make sure we get back the correct tokens based on our input.
 	tests := []struct {
@@ -116,6 +119,8 @@ func TestNextToken(t *testing.T) {
 		{token.NOT_EQ, "!="},
 		{token.INT, "9"},
 		{token.SEMICOLON, ";"},
+		{token.STRING, "foobar"},
+		{token.STRING, "foo bar"},
 		{token.EOF, ""},
 	}
 	// Create a new lexer
