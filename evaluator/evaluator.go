@@ -186,6 +186,8 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 		return nativeBoolToBooleanObject(left != right)
 	case left.Type() != right.Type():
 		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
+	case bothAreStrings(left, right):
+		return evalStringInfixExpression(operator, left, right)
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
@@ -193,6 +195,10 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 
 func bothAreIntegers(a, b object.Object) bool {
 	return (a.Type() == object.INTEGER_OBJ && b.Type() == object.INTEGER_OBJ)
+}
+
+func bothAreStrings(a, b object.Object) bool {
+	return (a.Type() == object.STRING_OBJ && b.Type() == object.STRING_OBJ)
 }
 
 func evalIntegerInfixExpression(operator string, left, right object.Object) object.Object {
@@ -351,6 +357,19 @@ func unwrapReturnValue(obj object.Object) object.Object {
 	}
 
 	return obj
+}
+
+func evalStringInfixExpression(operator string, left, right object.Object) object.Object {
+	// currently we only support concatenation: (string + string)
+	if operator != "+" {
+		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
+	}
+
+	leftVal := left.(*object.String).Value
+	rightVal := right.(*object.String).Value
+
+	return &object.String{Value: leftVal + rightVal}
+
 }
 
 /**
