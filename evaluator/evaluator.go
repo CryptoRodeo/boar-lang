@@ -289,12 +289,16 @@ func isError(obj object.Object) bool {
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
 	// check if value exists in env
-	val, ok := env.Get(node.Value)
-	if !ok {
-		return newError("identifier not found: " + node.Value)
+	if val, ok := env.Get(node.Value); ok {
+		return val
 	}
 
-	return val
+	// check if its a built in function when the value is not in the current env / scope
+	if builtin, ok := builtins[node.Value]; ok {
+		return builtin
+	}
+
+	return newError("identifier not found: " + node.Value)
 }
 
 // evaluate expressions (left to right)
@@ -313,22 +317,26 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
-	/**
-		- check if this object is a function
-		- convert it to a *object.Function reference (so we can access some fields)
-	**/
-	function, ok := fn.(*object.Function)
 
-	if !ok {
-		return newError("not a function => %s", fn.Type())
+	switch fn := fn.(type) {
+
+	// check if its a regular function
+	case *object.Function:
+		// create the inner function scope
+		extendedEnv := extendFunctionEnv(fn, args)
+		//evalute the function body with the inner scope
+		evaluated := Eval(fn.Body, extendedEnv)
+		// if the object has a return value, return that value
+		// else, return the object.
+		return unwrapReturnValue(evaluated)
+
+	// return the built in function, pass args
+	case *object.Builtin:
+		return fn.Fn(args...)
+
+	default:
+		return newError("not a function: %s", fn.Type())
 	}
-	// create the inner function scope
-	extendedEnv := extendFunctionEnv(function, args)
-	//evalute the function body with the inner scope
-	evaluated := Eval(function.Body, extendedEnv)
-	// if the object has a return value, return that value
-	// else, return the object.
-	return unwrapReturnValue(evaluated)
 }
 
 func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Environment {
