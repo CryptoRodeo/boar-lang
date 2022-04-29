@@ -611,11 +611,13 @@ func (p *Parser) parseStringLiteral() ast.Expression {
 func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 	list := []ast.Expression{}
 
+	// empty list
 	if p.peekTokenIs(end) {
 		p.nextToken()
 		return list
 	}
 
+	// first expression
 	p.nextToken()
 	list = append(list, p.parseExpression(LOWEST))
 
