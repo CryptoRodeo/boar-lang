@@ -115,6 +115,7 @@ func New(l *lexer.Lexer) *Parser {
 	// function expressions
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
+	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 
 	// Initialize the infix parse function map
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -571,8 +572,8 @@ func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 		function => identifier (i.e.: add, subtract, doTheThing)
 	*/
 	exp := &ast.CallExpression{Token: p.curToken, Function: function}
-	// (x,y,z
-	exp.Arguments = p.parseCallArguments()
+	// (x,y,z)
+	exp.Arguments = p.parseExpressionList(token.RPAREN)
 
 	return exp
 }
@@ -604,6 +605,44 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 
 func (p *Parser) parseStringLiteral() ast.Expression {
 	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
+}
+
+// parses a list of expressions until we reach the end of the list (via the end token type)
+func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
+	list := []ast.Expression{}
+
+	if p.peekTokenIs(end) {
+		p.nextToken()
+		return list
+	}
+
+	p.nextToken()
+	list = append(list, p.parseExpression(LOWEST))
+
+	// For each comma separated expression
+	for p.peekTokenIs(token.COMMA) {
+		// move up 2 tokens (so we land on the expressoin)
+		p.nextToken()
+		p.nextToken()
+		// parse the expression
+		list = append(list, p.parseExpression(LOWEST))
+	}
+
+	// If for some reason we haven't reached the end token we passed, return nil
+	if !p.expectPeek(end) {
+		return nil
+	}
+
+	return list
+
+}
+
+func (p *Parser) parseArrayLiteral() ast.Expression {
+	array := &ast.ArrayLiteral{Token: p.curToken}
+	// Grab all the elements before we reach the right bracket (end of array)
+	array.Elements = p.parseExpressionList(token.RBRACKET)
+
+	return array
 }
 
 /**
