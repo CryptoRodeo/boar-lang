@@ -351,3 +351,21 @@ func (al *ArrayLiteral) String() string {
 
 	return out.String()
 }
+
+type IndexExpression struct {
+	Token token.Token // the [ token
+	Left  Expression  // the object being access (array, some identifier, function call, etc)
+	Index Expression  // any expression as long as it produces an integer
+}
+
+func (ie *IndexExpression) expressionNode()      {}
+func (ie *IndexExpression) TokenLiteral() string { return ie.Token.Literal }
+func (ie *IndexExpression) String() string {
+	var out bytes.Buffer
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString("[")
+	out.WriteString(ie.Index.String())
+	out.WriteString("])")
+	return out.String()
+}
