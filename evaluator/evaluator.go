@@ -113,6 +113,21 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		return &object.Array{Elements: elements}
 
+	case *ast.IndexExpression:
+		// left -> the expression using the index operator: a[0], arr[3]
+		left := Eval(node.Left, env)
+		if isError(left) {
+			return left
+		}
+
+		// The index itself
+		index := Eval(node.Index, env)
+		if isError(index) {
+			return index
+		}
+
+		return evalIndexExpression(left, index)
+
 	}
 
 	return nil
@@ -202,11 +217,11 @@ func evalInfixExpression(operator string, left object.Object, right object.Objec
 }
 
 func bothAreIntegers(a, b object.Object) bool {
-	return (a.Type() == object.INTEGER_OBJ && b.Type() == object.INTEGER_OBJ)
+	return isInteger(a) && isInteger(b)
 }
 
 func bothAreStrings(a, b object.Object) bool {
-	return (a.Type() == object.STRING_OBJ && b.Type() == object.STRING_OBJ)
+	return isString(a) && isString(b)
 }
 
 func evalIntegerInfixExpression(operator string, left, right object.Object) object.Object {
@@ -386,6 +401,39 @@ func evalStringInfixExpression(operator string, left, right object.Object) objec
 
 	return &object.String{Value: leftVal + rightVal}
 
+}
+
+func evalIndexExpression(left, index object.Object) object.Object {
+	switch {
+	case isArray(left) && index.Type() == object.INTEGER_OBJ:
+		return evalArrayIndexExpression(left, index)
+	default:
+		return newError("index operator not supported: %s", left.Type())
+	}
+}
+
+func evalArrayIndexExpression(array, index object.Object) object.Object {
+	arrayObject := array.(*object.Array)
+	idx := index.(*object.Integer).Value
+	max := int64(len(arrayObject.Elements) - 1)
+
+	if idx < 0 || idx > max {
+		return NULL
+	}
+
+	return arrayObject.Elements[idx]
+}
+
+func isArray(o object.Object) bool {
+	return o.Type() == object.ARRAY_OBJ
+}
+
+func isInteger(o object.Object) bool {
+	return o.Type() == object.INTEGER_OBJ
+}
+
+func isString(o object.Object) bool {
+	return o.Type() == object.STRING_OBJ
 }
 
 /**
