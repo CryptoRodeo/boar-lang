@@ -405,7 +405,7 @@ func evalStringInfixExpression(operator string, left, right object.Object) objec
 
 func evalIndexExpression(left, index object.Object) object.Object {
 	switch {
-	case isArray(left) && index.Type() == object.INTEGER_OBJ:
+	case isArray(left) && isInteger(index):
 		return evalArrayIndexExpression(left, index)
 	default:
 		return newError("index operator not supported: %s", left.Type())
@@ -415,6 +415,7 @@ func evalIndexExpression(left, index object.Object) object.Object {
 func evalArrayIndexExpression(array, index object.Object) object.Object {
 	arrayObject := array.(*object.Array)
 	idx := index.(*object.Integer).Value
+	// total number of elements in the current array
 	max := int64(len(arrayObject.Elements) - 1)
 
 	if idx < 0 || idx > max {
