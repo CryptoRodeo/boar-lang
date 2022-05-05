@@ -8,6 +8,7 @@ var builtins = map[string]*object.Builtin{
 	"first": {Fn: __first__},
 	"last":  {Fn: __last__},
 	"rest":  {Fn: __rest__},
+	"push":  {Fn: __push__},
 }
 
 func checkForArrayErrors(functionName string, args ...object.Object) object.Object {
@@ -86,4 +87,30 @@ func __rest__(args ...object.Object) object.Object {
 
 	return NULL
 
+}
+
+/**
+- Returns a new array with the pushed element at the end.
+- Arrays are immutable in monke-lang, so it doesn't modify the given array
+**/
+func __push__(args ...object.Object) object.Object {
+
+	if len(args) != 2 {
+		return newError("wrong number of arguments. got=%d, want=2",
+			len(args))
+	}
+
+	if !isArray(args[0]) {
+		return newError("argument to `push` must be ARRAY, got %s",
+			args[0].Type())
+	}
+
+	arr := args[0].(*object.Array)
+	length := len(arr.Elements)
+
+	newElements := make([]object.Object, length-1, length-1)
+	copy(newElements, arr.Elements)
+	newElements[length] = args[1]
+
+	return &object.Array{Elements: newElements}
 }
