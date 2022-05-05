@@ -7,15 +7,16 @@ var builtins = map[string]*object.Builtin{
 	"len":   {Fn: __len__},
 	"first": {Fn: __first__},
 	"last":  {Fn: __last__},
+	"rest":  {Fn: __rest__},
 }
 
-func checkForArrayErrors(args ...object.Object) object.Object {
+func checkForArrayErrors(functionName string, args ...object.Object) object.Object {
 	if len(args) != 1 {
 		return newError("wrong number of arguments, got %d wanted 1", len(args))
 	}
 
 	if !isArray(args[0]) {
-		return newError("argument to `first` must be ARRAY, got %s", args[0].Type())
+		return newError("argument to `%s` must be ARRAY, got %s", functionName, args[0].Type())
 	}
 
 	return NULL
@@ -41,7 +42,7 @@ func __len__(args ...object.Object) object.Object {
 }
 
 func __first__(args ...object.Object) object.Object {
-	checkForArrayErrors(args...)
+	checkForArrayErrors("first", args...)
 
 	arr := args[0].(*object.Array)
 
@@ -53,13 +54,34 @@ func __first__(args ...object.Object) object.Object {
 }
 
 func __last__(args ...object.Object) object.Object {
-	checkForArrayErrors(args...)
+	checkForArrayErrors("last", args...)
 
 	arr := args[0].(*object.Array)
 
 	length := len(arr.Elements)
 	if length > 0 {
 		return arr.Elements[length-1]
+	}
+
+	return NULL
+
+}
+
+/**
+- returns a new array containing all the elements of the array passed as argument *except* the first one.
+- Similar to the cdr function in Scheme (also similar to tail)
+**/
+func __rest__(args ...object.Object) object.Object {
+	checkForArrayErrors("rest", args...)
+
+	arr := args[0].(*object.Array)
+	length := len(arr.Elements)
+
+	if length > 0 {
+		newElements := make([]object.Object, length-1, length-1)
+		copy(newElements, arr.Elements[1:length])
+
+		return &object.Array{Elements: newElements}
 	}
 
 	return NULL
