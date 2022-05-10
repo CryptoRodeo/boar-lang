@@ -29,6 +29,7 @@ const (
 	// Delimiters
 	COMMA     = ","
 	SEMICOLON = ";"
+	COLON     = ":"
 
 	//parenthesis + brackets
 	LPAREN   = "("
