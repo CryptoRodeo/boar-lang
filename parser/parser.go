@@ -118,6 +118,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
+	p.registerPrefix(token.LBRACE, p.parseHashLiteral)
 
 	// Initialize the infix parse function map
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -671,6 +672,41 @@ func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 	}
 
 	return exp
+}
+
+func (p *Parser) parseHashLiteral() ast.Expression {
+	hash := &ast.HashLiteral{Token: p.curToken} // the { symbol
+	hash.Pairs = make(map[ast.Expression]ast.Expression)
+
+	// Until we reach an } (the end of the hash)
+	for !p.peekTokenIs(token.RBRACE) {
+		p.nextToken()
+
+		key := p.parseExpression(LOWEST)
+
+		// A key should be followed by a : (ex: "key":"value")
+		if !p.expectPeek(token.COLON) {
+			return nil
+		}
+
+		p.nextToken()
+		// grab the value
+		value := p.parseExpression(LOWEST)
+		// create the pair
+		hash.Pairs[key] = value
+
+		// If we haven't reached a right brace (end of hash) or comma (next pair)
+		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
+			return nil
+		}
+	}
+
+	// If we haven't reach the end of the hash by now, somethings wrong.
+	if !p.expectPeek(token.RBRACE) {
+		return nil
+	}
+
+	return hash
 }
 
 /**
