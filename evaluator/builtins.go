@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"monkey/object"
 )
 
@@ -17,6 +18,7 @@ var builtins = map[string]*object.Builtin{
 	"last":  {Fn: __last__},
 	"rest":  {Fn: __rest__},
 	"push":  {Fn: __push__},
+	"puts":  {Fn: __puts__},
 }
 
 func checkForArrayErrors(formatter ArrayErrorFormatter) object.Object {
@@ -131,4 +133,12 @@ func __push__(args ...object.Object) object.Object {
 	newElements[length] = args[1]
 
 	return &object.Array{Elements: newElements}
+}
+
+func __puts__(args ...object.Object) object.Object {
+	for _, arg := range args {
+		fmt.Println(arg.Inspect())
+	}
+
+	return NULL
 }
