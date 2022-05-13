@@ -143,7 +143,7 @@ type HashKey struct {
 	Value uint64
 }
 
-func (b *Boolean) Hashkey() HashKey {
+func (b *Boolean) HashKey() HashKey {
 	var value uint64
 
 	if b.Value {
@@ -155,7 +155,7 @@ func (b *Boolean) Hashkey() HashKey {
 	return HashKey{Type: b.Type(), Value: value}
 }
 
-func (i *Integer) Hashkey() HashKey {
+func (i *Integer) HashKey() HashKey {
 	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
 }
 
