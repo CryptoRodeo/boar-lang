@@ -192,6 +192,12 @@ func (h *Hash) Inspect() string {
 	return out.String()
 }
 
+// Used to check if the given object is usable as a hash key when evaluating hash literals
+// or hash index expressions
+type Hashable interface {
+	HashKey() HashKey
+}
+
 /**
 Dev notes:
 - every value we encounter and evaluate will be represented using an Object interace
