@@ -32,6 +32,7 @@ const (
 	PRODUCT     // *
 	PREFIX      // -X or !X
 	CALL        // myFunction(x)
+	INDEX       //array[index]
 )
 
 /**
@@ -51,6 +52,7 @@ var precedences = map[token.TokenType]int{
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
+	token.LBRACKET: INDEX,
 }
 
 /**
@@ -114,6 +116,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.IF, p.parseIfExpression)
 	// function expressions
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
+	p.registerPrefix(token.STRING, p.parseStringLiteral)
+	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
+	p.registerPrefix(token.LBRACE, p.parseHashLiteral)
 
 	// Initialize the infix parse function map
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
@@ -126,6 +131,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
+	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 
 	return p
 }
@@ -570,8 +576,8 @@ func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 		function => identifier (i.e.: add, subtract, doTheThing)
 	*/
 	exp := &ast.CallExpression{Token: p.curToken, Function: function}
-	// (x,y,z
-	exp.Arguments = p.parseCallArguments()
+	// (x,y,z)
+	exp.Arguments = p.parseExpressionList(token.RPAREN)
 
 	return exp
 }
@@ -599,6 +605,108 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 	}
 
 	return args
+}
+
+func (p *Parser) parseStringLiteral() ast.Expression {
+	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
+}
+
+// parses a list of expressions until we reach the end of the list (via the end token type)
+func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
+	list := []ast.Expression{}
+
+	// empty list
+	if p.peekTokenIs(end) {
+		p.nextToken()
+		return list
+	}
+
+	// first expression
+	p.nextToken()
+	list = append(list, p.parseExpression(LOWEST))
+
+	// For each comma separated expression
+	for p.peekTokenIs(token.COMMA) {
+		// move up 2 tokens (so we land on the expressoin)
+		p.nextToken()
+		p.nextToken()
+		// parse the expression
+		list = append(list, p.parseExpression(LOWEST))
+	}
+
+	// If for some reason we haven't reached the end token we passed, return nil
+	if !p.expectPeek(end) {
+		return nil
+	}
+
+	return list
+
+}
+
+func (p *Parser) parseArrayLiteral() ast.Expression {
+	array := &ast.ArrayLiteral{Token: p.curToken}
+	// Grab all the elements before we reach the right bracket (end of array)
+	array.Elements = p.parseExpressionList(token.RBRACKET)
+
+	return array
+}
+
+func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
+	/**
+		In this function the [  in someArray[0] is treated as the infix operator.
+		someArray being the left operand and 0 being the right operand
+	**/
+	// curToken => [
+	// left => some identifier, array literal, etc
+	exp := &ast.IndexExpression{Token: p.curToken, Left: left}
+
+	// move pointer to where the index expression is
+	p.nextToken()
+
+	// parse the index expression (1, 1+1, a*b, etc)
+	exp.Index = p.parseExpression(LOWEST)
+
+	// we should reach a ] after the index expression
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+
+	return exp
+}
+
+func (p *Parser) parseHashLiteral() ast.Expression {
+	hash := &ast.HashLiteral{Token: p.curToken} // the { symbol
+	hash.Pairs = make(map[ast.Expression]ast.Expression)
+
+	// Until we reach an } (the end of the hash)
+	for !p.peekTokenIs(token.RBRACE) {
+		p.nextToken()
+
+		key := p.parseExpression(LOWEST)
+
+		// A key should be followed by a : (ex: "key":"value")
+		if !p.expectPeek(token.COLON) {
+			return nil
+		}
+
+		p.nextToken()
+		// grab the value
+		value := p.parseExpression(LOWEST)
+		// create the pair
+		hash.Pairs[key] = value
+
+		// If we haven't reached a right brace (end of hash) or comma (next pair)
+		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
+			return nil
+		}
+	}
+
+	// If we haven't reach the end of the hash by now, somethings wrong.
+	if !p.expectPeek(token.RBRACE) {
+		return nil
+	}
+
+	return hash
 }
 
 /**

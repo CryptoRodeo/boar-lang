@@ -10,8 +10,9 @@ const (
 	EOF = "EOF"
 
 	// Idenfifiers + literals
-	IDENT = "IDENT" // add, foobar, x, y, etc.
-	INT   = "INT"   // 123456
+	IDENT  = "IDENT" // add, foobar, x, y, etc.
+	INT    = "INT"   // 123456
+	STRING = "STRING"
 
 	// Operators
 	ASSIGN   = "="
@@ -28,12 +29,15 @@ const (
 	// Delimiters
 	COMMA     = ","
 	SEMICOLON = ";"
+	COLON     = ":"
 
 	//parenthesis + brackets
-	LPAREN = "("
-	RPAREN = ")"
-	LBRACE = "{"
-	RBRACE = "}"
+	LPAREN   = "("
+	RPAREN   = ")"
+	LBRACE   = "{"
+	RBRACE   = "}"
+	LBRACKET = "["
+	RBRACKET = "]"
 
 	// Keywords
 	FUNCTION = "FUNCTION"
