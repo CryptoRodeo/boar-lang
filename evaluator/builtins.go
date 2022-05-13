@@ -1,6 +1,14 @@
 package evaluator
 
-import "monkey/object"
+import (
+	"monkey/object"
+)
+
+type ArrayErrorFormatter struct {
+	FuncName          string
+	ArgumentsExpected int
+	Arguments         []object.Object
+}
 
 var builtins = map[string]*object.Builtin{
 	//len()
@@ -11,9 +19,12 @@ var builtins = map[string]*object.Builtin{
 	"push":  {Fn: __push__},
 }
 
-func checkForArrayErrors(functionName string, args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("wrong number of arguments, got %d wanted 1", len(args))
+func checkForArrayErrors(formatter ArrayErrorFormatter) object.Object {
+	args := formatter.Arguments
+	functionName := formatter.FuncName
+	argumentsExpected := formatter.ArgumentsExpected
+	if len(args) != argumentsExpected {
+		return newError("wrong number of arguments, got %d wanted %d", len(args), argumentsExpected)
 	}
 
 	if !isArray(args[0]) {
@@ -43,7 +54,11 @@ func __len__(args ...object.Object) object.Object {
 }
 
 func __first__(args ...object.Object) object.Object {
-	checkForArrayErrors("first", args...)
+	err := checkForArrayErrors(ArrayErrorFormatter{FuncName: "first", ArgumentsExpected: 1, Arguments: args})
+
+	if err != NULL {
+		return err
+	}
 
 	arr := args[0].(*object.Array)
 
@@ -55,7 +70,11 @@ func __first__(args ...object.Object) object.Object {
 }
 
 func __last__(args ...object.Object) object.Object {
-	checkForArrayErrors("last", args...)
+	err := checkForArrayErrors(ArrayErrorFormatter{FuncName: "last", ArgumentsExpected: 1, Arguments: args})
+
+	if err != NULL {
+		return err
+	}
 
 	arr := args[0].(*object.Array)
 
@@ -73,7 +92,11 @@ func __last__(args ...object.Object) object.Object {
 - Similar to the cdr function in Scheme (also similar to tail)
 **/
 func __rest__(args ...object.Object) object.Object {
-	checkForArrayErrors("rest", args...)
+	err := checkForArrayErrors(ArrayErrorFormatter{FuncName: "rest", ArgumentsExpected: 1, Arguments: args})
+
+	if err != NULL {
+		return err
+	}
 
 	arr := args[0].(*object.Array)
 	length := len(arr.Elements)
@@ -94,21 +117,16 @@ func __rest__(args ...object.Object) object.Object {
 - Arrays are immutable in monke-lang, so it doesn't modify the given array
 **/
 func __push__(args ...object.Object) object.Object {
+	err := checkForArrayErrors(ArrayErrorFormatter{FuncName: "push", ArgumentsExpected: 2, Arguments: args})
 
-	if len(args) != 2 {
-		return newError("wrong number of arguments. got=%d, want=2",
-			len(args))
-	}
-
-	if !isArray(args[0]) {
-		return newError("argument to `push` must be ARRAY, got %s",
-			args[0].Type())
+	if err != NULL {
+		return err
 	}
 
 	arr := args[0].(*object.Array)
 	length := len(arr.Elements)
 
-	newElements := make([]object.Object, length-1, length-1)
+	newElements := make([]object.Object, length+1)
 	copy(newElements, arr.Elements)
 	newElements[length] = args[1]
 
