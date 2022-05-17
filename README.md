@@ -3,6 +3,25 @@
 
 Go-based language interpreter for a toy programming language called "monke"
 
+**How to run**
+
+The recommended way is to use Docker:
+```
+docker build . -t monke-lang
+docker run -it monke-lang --name="monke-lang"
+
+Hello root, feel free to type in commands
+~> 
+```
+
+You can also just run it regularly:
+```
+go run .
+
+Hello kilgore, feel free to type in commands
+~> 
+```
+
 Features:
 
 **Basic math operations:**
