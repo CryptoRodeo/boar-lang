@@ -3,7 +3,11 @@
 
 Go-based language interpreter for a toy programming language called "monke"
 
-**How to run**
+## Implementation Details:
+- This interpreter uses a tree-walking strategy, starting at the top of the AST, traversing every AST Node and then evaluating its statement(s)
+- The parser uses the Vaughan Pratt parsing implementation of associating parsing functions with different token types as well as handling different precedence levels.
+
+## How to run
 
 The recommended way is to use Docker:
 ```
@@ -22,7 +26,7 @@ Hello kilgore, feel free to type in commands
 ~> 
 ```
 
-Features:
+## Language Features:
 
 **Basic math operations:**
 ```
@@ -131,3 +135,6 @@ John
 ~> person["age"]
 30
 ```
+And **much more**
+
+Feel free to explore the code base!
