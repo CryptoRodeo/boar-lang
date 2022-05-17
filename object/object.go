@@ -133,7 +133,7 @@ func (a *Array) Inspect() string {
 
 	out.WriteString("[")
 	out.WriteString(strings.Join(elements, ", "))
-	out.WriteString("0")
+	out.WriteString("]")
 
 	return out.String()
 }
