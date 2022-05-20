@@ -370,6 +370,26 @@ func (ie *IndexExpression) String() string {
 	return out.String()
 }
 
+type IndexAssignment struct {
+	Token token.Token // the = token
+	Left  Expression
+	Index Expression
+	Value Expression
+}
+
+func (ia *IndexAssignment) expressionNode()      {}
+func (ia *IndexAssignment) TokenLiteral() string { return ia.Token.Literal }
+func (ia *IndexAssignment) String() string {
+	var out bytes.Buffer
+	out.WriteString(ia.Left.String())
+	out.WriteString("[")
+	out.WriteString(ia.Index.String())
+	out.WriteString("]")
+	out.WriteString("=")
+	out.WriteString(ia.Value.String())
+	return out.String()
+}
+
 /**
 The basic syntactic structure of a hash literal is:
 {<expression> : <expression>, ... }
