@@ -889,6 +889,35 @@ func TestParsingIndexExpressoins(t *testing.T) {
 	}
 }
 
+func TestParsingIndexAssignments(t *testing.T) {
+	input := "hash[1 + 1] = 2"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+	indexExp, ok := stmt.Expression.(*ast.IndexAssignment)
+
+	if !ok {
+		t.Fatalf("exp not *ast.IndexAssignment, got %T", stmt.Expression)
+	}
+
+	if !testIdentifier(t, indexExp.Left, "hash") {
+		return
+	}
+
+	if !testInfixExpression(t, indexExp.Index, 1, "+", 1) {
+		return
+	}
+
+	if !testIntegerLiteral(t, indexExp.Value, 2) {
+		fmt.Println("Not the correct value, got", indexExp)
+		return
+	}
+}
+
 func TestParsingHashLiteralsStringKeys(t *testing.T) {
 	input := `{"one": 1, "two": 2, "three": 3}`
 
