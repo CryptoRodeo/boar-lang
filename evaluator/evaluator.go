@@ -128,6 +128,27 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		return evalIndexExpression(left, index)
 
+	case *ast.IndexAssignment:
+		// left -> The expression using the index operator: hash[a], arr[2+2], etc
+		left := Eval(node.Left, env)
+		if isError(left) {
+			return left
+		}
+
+		// Evaluate the index expression
+		index := Eval(node.Index, env)
+		if isError(index) {
+			return index
+		}
+
+		// Evaluate the value
+		value := Eval(node.Value, env)
+		if isError(value) {
+			return value
+		}
+
+		return evalIndexAssignment(left, index, value, env)
+
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
 
@@ -472,6 +493,22 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 	}
 
 	return pair.Value
+}
+
+func evalIndexAssignment(hash, index, value object.Object, env *object.Environment) object.Object {
+	indexable := hash.(*object.Hash)
+
+	key, ok := index.(object.Hashable)
+
+	if !ok {
+		return newError("unusable value as hash key: %s", index.Type())
+	}
+
+	hashed_key := key.HashKey()
+
+	indexable.Pairs[hashed_key] = object.HashPair{Key: index, Value: value}
+
+	return value
 }
 
 func isArray(o object.Object) bool {
