@@ -587,3 +587,18 @@ func TestHashIndexExpressions(t *testing.T) {
 		}
 	}
 }
+
+func TestHashAssignments(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{`let hash = {"a": 2 }; hash["a"] = 5; hash["a"]`, 5},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer := tt.expected
+		testIntegerObject(t, evaluated, integer)
+	}
+}
