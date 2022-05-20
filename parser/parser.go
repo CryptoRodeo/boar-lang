@@ -673,22 +673,38 @@ func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 		return nil
 	}
 
-	// Check if this is an index assigment
+	// Check if we're trying to assign a value at some index / key.
+	// If we are, the next token should be '='
 	// hash[a] = 2, arr[0] = 1
 	if p.peekTokenIs(token.ASSIGN) {
-		p.nextToken()
-		// =
-		token := p.curToken
-		// move onto what should be a value
-		p.nextToken()
-		// we should now have some value to parse
-		value := p.parseExpression(LOWEST)
-		exp := &ast.IndexAssignment{Left: left, Index: index, Token: token, Value: value}
-
-		return exp
+		return p.parseIndexAssignment(exp, index)
 	}
 
 	return exp
+}
+
+func (p *Parser) parseIndexAssignment(node, index ast.Expression) ast.Expression {
+
+	indexExp, ok := node.(*ast.IndexExpression)
+
+	if !ok {
+		return nil
+	}
+
+	// Grab the identifier from the original IndexExpression
+	// a[index], hash[key] => a, hash
+	identifier := indexExp.Left
+
+	// we should currently be at the ']' token, traverse to the assign token
+	p.nextToken()
+	// We should now be at the assign token '='
+	token := p.curToken
+	// move onto what should be a value
+	p.nextToken()
+	// we should now have some value to parse
+	value := p.parseExpression(LOWEST)
+
+	return &ast.IndexAssignment{Left: identifier, Index: index, Token: token, Value: value}
 }
 
 func (p *Parser) parseHashLiteral() ast.Expression {
