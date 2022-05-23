@@ -1,7 +1,7 @@
 # monke-lang
-*"Return To Monke 🐒"*
+> "[Reject humanity, return to monke](https://knowyourmeme.com/memes/return-to-monke)" 🐒
 
-Go-based language interpreter for a toy programming language called "monke"
+Go-based language interpreter for a toy programming language called "monke" (pronounced "monk")
 
 ## Implementation Details:
 - This interpreter uses a tree-walking strategy, starting at the top of the AST, traversing every AST Node and then evaluating its statement(s)
