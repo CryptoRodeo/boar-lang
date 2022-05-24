@@ -1,9 +1,32 @@
 # monke-lang
-*"Return To Monke 🐒"*
+> "[Reject humanity, return to monke](https://knowyourmeme.com/memes/return-to-monke)" 🐒
 
-Go-based language interpreter for a toy programming language called "monke"
+Go-based language interpreter for a toy programming language called "monke" (pronounced "monk")
 
-Features:
+## Implementation Details:
+- This interpreter uses a tree-walking strategy, starting at the top of the AST, traversing every AST Node and then evaluating its statement(s)
+- The parser uses the Vaughan Pratt parsing implementation of associating parsing functions with different token types as well as handling different precedence levels.
+
+## How to run
+
+The recommended way is to use Docker:
+```
+docker build . -t monke-lang
+docker run -it monke-lang --name="monke-lang"
+
+Hello root, feel free to type in commands
+~> 
+```
+
+You can also just run it regularly:
+```
+go run .
+
+Hello kilgore, feel free to type in commands
+~> 
+```
+
+## Language Features:
 
 **Basic math operations:**
 ```
@@ -112,3 +135,6 @@ John
 ~> person["age"]
 30
 ```
+And **much more**
+
+Feel free to explore the code base!
