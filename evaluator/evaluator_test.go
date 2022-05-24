@@ -602,3 +602,25 @@ func TestHashAssignments(t *testing.T) {
 		testIntegerObject(t, evaluated, integer)
 	}
 }
+
+func TestHashKeyDeletions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`let hash = {"a": 2 }; delete(hash, "a"); hash["a"]`, nil},
+		{`let hash = {"a": 2, "b": 3 }; delete(hash, "b"); hash["b"]`, nil},
+		{`let hash = {"a": 2, "b":3, "c": 4 }; delete(hash, "a", "b"); hash["c"]`, 4},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
+}
