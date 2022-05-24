@@ -624,3 +624,26 @@ func TestHashKeyDeletions(t *testing.T) {
 		}
 	}
 }
+
+func TestHashKeyRetrieval(t *testing.T) {
+	expected_results := [][]interface{}{
+		{2},
+		{2, 3},
+		{2, nil},
+		{nil, nil, nil},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let hash = {"a": 2 }; valuesAt(hash, "a");`, expected_results[0]},
+		{`let hash = {"a": 2, "b": 3 };  valuesAt(hash, "a", "b")`, expected_results[1]},
+		{`let hash = {"a": 2, "b": 3 }; delete(hash, "b","a"); valuesAt(hash,"a","b") `, expected_results[2]},
+		{`let hash = {"a": 2, "b":3, "c": 4 }; delete(hash, "a", "b", "x"); valuesAt(hash, "a","b","c")`, expected_results[3]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+
+	}
+}
