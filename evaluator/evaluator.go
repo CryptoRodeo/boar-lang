@@ -135,19 +135,19 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return left
 		}
 
-		// Evaluate the index expression
+		// Evaluate the index expression: [2+2], [10 < 5], etc
 		index := Eval(node.Index, env)
 		if isError(index) {
 			return index
 		}
 
-		// Evaluate the value
+		// Evaluate the value: 2+2, "hello world", etc
 		value := Eval(node.Value, env)
 		if isError(value) {
 			return value
 		}
 
-		return evalIndexAssignment(left, index, value, env)
+		return evalIndexAssignment(left, index, value)
 
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
@@ -495,7 +495,7 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 	return pair.Value
 }
 
-func evalIndexAssignment(hash, index, value object.Object, env *object.Environment) object.Object {
+func evalIndexAssignment(hash, index, value object.Object) object.Object {
 	indexable := hash.(*object.Hash)
 
 	key, ok := index.(object.Hashable)
