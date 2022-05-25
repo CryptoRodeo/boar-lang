@@ -14,8 +14,6 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-#RUN chmod 777 ./app.sh
-
 RUN go build -v -o /code ./
 
 RUN useradd -m ${USER} --uid=${UID} && echo "${USER}:${PW}" | chpasswd
