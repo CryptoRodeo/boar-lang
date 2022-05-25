@@ -706,3 +706,28 @@ func TestHashToArrayConversion(t *testing.T) {
 		testArrayValues(t, evaluated, tt.expected)
 	}
 }
+
+func TestHashDigging(t *testing.T) {
+	expected_results := []string{
+		"yellow boots",
+	}
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{`let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } }; dig(person, "clothes", "shoes");`, expected_results[0]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		val, ok := evaluated.(*object.String)
+
+		if !ok {
+			t.Errorf("object is not String, got %T (%+v)", val, val)
+		}
+
+		if val.Value != tt.expected {
+			t.Errorf("Invalid value returned, expected: %s , got: %s", tt.expected, val)
+		}
+	}
+}
