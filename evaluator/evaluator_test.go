@@ -678,6 +678,31 @@ func contains(array []object.Object, value interface{}) bool {
 		if isNull && value == nil {
 			return true
 		}
+
+		stringVal, _ := value.(string)
+		stringObject, isString := val.(*object.String)
+		if isString && stringObject.Value == stringVal {
+			return true
+		}
 	}
 	return false
+}
+
+func TestHashToArrayConversion(t *testing.T) {
+	expected_results := [][]interface{}{
+		{"a", 2},
+		{"a", 2, "b", 3},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let hash = {"a": 2 }; toArray(hash)`, expected_results[0]},
+		{`let hash = {"a": 2, "b": 3 };  toArray(hash)`, expected_results[1]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testArrayValues(t, evaluated, tt.expected)
+	}
 }
