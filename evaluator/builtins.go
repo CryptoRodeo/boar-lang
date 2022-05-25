@@ -21,6 +21,7 @@ var builtins = map[string]*object.Builtin{
 	"puts":     {Fn: __puts__},
 	"delete":   {Fn: __delete__},
 	"valuesAt": {Fn: __valuesAt__},
+	"toArray":  {Fn: __toArray__},
 }
 
 func checkForArrayErrors(formatter ArrayErrorFormatter) object.Object {
@@ -180,7 +181,6 @@ func __valuesAt__(args ...object.Object) object.Object {
 	arr := &object.Array{}
 
 	// The remaining arguments should be valid hash keys.
-	// Loop through them and null their values
 	for _, arg := range args[1:] {
 		hashKey, ok := arg.(object.Hashable)
 
@@ -190,6 +190,24 @@ func __valuesAt__(args ...object.Object) object.Object {
 
 		// Grab the value at said key, append to array
 		arr.Elements = append(arr.Elements, hash.Pairs[hashKey.HashKey()].Value)
+	}
+
+	return arr
+}
+
+func __toArray__(args ...object.Object) object.Object {
+	// First argument must be a hash
+	hash, ok := args[0].(*object.Hash)
+
+	if !ok {
+		return newError("argument to 'delete must be HASH, got %s instead.", args[0].Type())
+	}
+
+	// Create array object to store object values at x key
+	arr := &object.Array{}
+
+	for _, pair := range hash.Pairs {
+		arr.Elements = append(arr.Elements, pair.Key, pair.Value)
 	}
 
 	return arr
