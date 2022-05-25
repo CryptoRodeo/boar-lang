@@ -22,6 +22,7 @@ var builtins = map[string]*object.Builtin{
 	"delete":   {Fn: __delete__},
 	"valuesAt": {Fn: __valuesAt__},
 	"toArray":  {Fn: __toArray__},
+	"dig":      {Fn: __dig__},
 }
 
 func checkForArrayErrors(formatter ArrayErrorFormatter) object.Object {
@@ -211,4 +212,45 @@ func __toArray__(args ...object.Object) object.Object {
 	}
 
 	return arr
+}
+
+func __dig__(args ...object.Object) object.Object {
+
+	if len(args) == 0 {
+		return newError("`dig` requires at least 2 arguments: a HASH and a key to search for.")
+	}
+
+	// First argument must be a hash
+	hash, ok := args[0].(*object.Hash)
+
+	if !ok {
+		return newError("Argument to `dig` must be HASH, got %s instead.", args[0].Type())
+	}
+
+	if len(args) == 1 {
+		return hash
+	}
+
+	hashKey, ok := args[1].(object.Hashable)
+
+	if !ok {
+		return newError("Unusable value as hash key: %s", args[1].Type())
+	}
+
+	extracted, exists := hash.Pairs[hashKey.HashKey()]
+
+	if exists {
+		// if we only have 2 args (someInnerHash, key), and we've found the value exists then return it
+		if len(args) == 2 {
+			return extracted.Value
+		}
+
+		newArgs := []object.Object{}
+		newArgs = append(newArgs, extracted.Value)
+		newArgs = append(newArgs, args[2:]...)
+
+		return __dig__(newArgs...)
+	}
+
+	return nil
 }
