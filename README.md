@@ -2,20 +2,22 @@
 > "[Reject humanity, return to monke](https://knowyourmeme.com/memes/return-to-monke)" 🐒
 
 Go-based language interpreter for a toy programming language called "monke" (pronounced "monk")
-
-## Implementation Details:
-- This interpreter uses a tree-walking strategy, starting at the top of the AST, traversing every AST Node and then evaluating its statement(s)
-- The parser uses the Vaughan Pratt parsing implementation of associating parsing functions with different token types as well as handling different precedence levels.
-
-## How to run
+## Quick Start Guide:
 
 The recommended way is to use Docker:
 ```
+git clone git@github.com:CryptoRodeo/monke-lang.git
+
+cd ./monke-lang
+
 docker build . -t monke-lang
+
 docker run -it monke-lang --name="monke-lang"
 
-Hello root, feel free to type in commands
+Hello monke, feel free to type in commands
 ~> 
+
+# To exit use Ctrl-C
 ```
 
 You can also just run it regularly:
@@ -91,7 +93,8 @@ Hello World
 ~> addTwo(3);
 5
 ~> let addThree = newAdder(3);
-~> a
+~> addThree(5)
+8
 ```
 
 **first class functions**
@@ -105,7 +108,7 @@ Hello World
 8
 ```
 
-**Arrays and built in functions:**
+**Arrays:**
 ```
 ~> let x = [1,2,3]
 ~> x
@@ -134,7 +137,22 @@ Hello World
 John
 ~> person["age"]
 30
-```
-And **much more**
+~> let USDrinkingAge = 21
+~> person["age"] = USDrinkingAge
+21
+~> person["age"]
+21
+~> valuesAt(person, "age", "name")
+[21, John]
+~> toArray(person)
+[name, John, age, 21]
+~> delete(person, "age")
+{name: John, null: null}
+~> person["age"]
+null
 
-Feel free to explore the code base!
+```
+## Implementation Details:
+- This interpreter uses a tree-walking strategy, starting at the top of the AST, traversing every AST Node and then evaluating its statement(s)
+- The parser uses the Vaughan Pratt parsing implementation of associating parsing functions with different token types as well as handling different precedence levels.
+
