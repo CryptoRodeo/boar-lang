@@ -1,0 +1,228 @@
+- fix README.md example
+- Merge pull request #8 from CryptoRodeo/hash-improvements
+- update README.md
+- WIP: implement the Hash#dig method
+- add test to dig hashes by keys
+- fix and update README.md
+- Merge branch 'main' into hash-improvements
+- delete this
+- add built in function to convert hash to array
+- add test to convert hash object to array
+- finished test for hash value retrieval
+- WIP: add function and test to extract hash values
+- add new built in function for hash key deletions
+- add test for hash key deletions
+- remove unused env argument
+- improve docker file (dont run root kids)
+- Merge branch 'main' of github.com:CryptoRodeo/monke-lang into main
+- Update README.md
+- small refactor for the index assignment parsing
+- add case in evaluator for hash assignments
+- WIP - Add test to evaluate hash assignments
+- add IndexAssignment AST Node (WIP)
+- add lexer test for parsing hash index assignments
+- add test for parsing index assignments (WIP)
+- add case where we might be assigning a value at an index
+- Update README.md
+- Update README.md
+- update jenkins script
+- fix hash inspect output
+- add hash indexing functionality
+- add test for hash indexing
+- update README.md
+- Update README.md
+- Update README.md
+- Merge pull request #7 from CryptoRodeo/extend
+- finally test puts implementation
+- implement "puts"
+- update test, still havent implemented puts yet
+- refactor, fix failing tests
+- Evaluate hashes
+- Add test for evaluating hash literals
+- Whoops
+- add hashable interface
+- Add inspect method for hashes
+- Define hash pair, hash and related methods
+- add methods to generate hash keys
+- add test to compare hash keys
+- add support for parsing hash literals
+- add tests for parsing hashes
+- add hash literal AST node
+- lex colons
+- add test to parse hash literals
+- Add semicolon token
+- add support for 'push' method
+- add support for 'rest' built in function
+- add tests for built in functions
+- small refactor, add support for 'last' inbuilt function
+- add support for arrays in the built in 'len' function
+- small changes
+- evaluate index expressions + new helper functions
+- test evaluating index expressions
+- evaluate arrays
+- test evaluating arrays
+- add array object struct + functions
+- parse index expressions
+- add test for index expression parsing
+- lets support index expressions
+- more comments
+- parse array literals, refactor parsing call expressions
+- define array ast node
+- test parsing array literals
+- support creating bracket tokens in the lexer
+- test support for array brackets in lexer
+- let start supporting arrays
+- allow builtin functions to be handled by evaluator
+- update test
+- fully functional len() builtin method
+- first built-in function: len()
+- lets create some built-in functions
+- support string concatenation
+- add test + regression test for string concat
+- add test case for evaluating string literals
+- evaluate strings properly
+- add strings to the object system
+- create & register function for string literal parsing
+- create test for parsing string literals
+- add string literal AST node
+- handle strings in lexer
+- extend test
+- add string literal TokenType
+- Merge pull request #6 from CryptoRodeo/evaluation
+- spelling fix
+- yeah boi we got closures too
+- hell yeah, we can now define and call functions!
+- allow for inner scopes
+- WIP: evaluate call expressions
+- add test to test function applications
+- evalute those functions
+- add test to evaluate functions
+- add definition and methods for func objects
+- update repl to use new env object
+- update evaluator to use new env object
+- test evaluating let statements
+- add environment object
+- add tests for internal error handling
+- add internal error handling
+- Add error struct and type
+- use new method for BlockStatements to parse return statements
+- add more complex test scenario
+- Add return statement evaluation
+- add test to evaluate return statements with ints
+- add return value object
+- evaluate conditionals
+- add test and helper function for conditionals
+- add dev notes
+- add support for boolean infix expressions
+- extend tests for boolean operand evaluation
+- evaluate infix boolean expressions
+- extend test, add boolean infix expressions
+- yeah dawg evaluate integer infix expressions
+- extend tests for infix operators
+- small comment
+- evaluate minus operator prefix expressions
+- extend test to prepare parsing prefix expressions
+- smol note
+- parse bang operator expressions
+- Test evaluating bang operator prefix expressions
+- add NULL object
+- optimize evaluating booleans
+- Merge branch 'evaluation' of github.com:CryptoRodeo/monke-lang into evaluation
+- smol note change
+- add boolean evaluation test
+- update REPL message
+- evaluate booleans
+- update message
+- lets now put the E in REPL
+- remove phallic banana, change prompt to fish shell style
+- add note on self-evaluating expressions
+- update jenkins test script
+- add evaluator, evaluate integers from the AST for now.
+- Add evaluator test
+- tread safely now, we're implementing null
+- Adding bools
+- Add integer object
+- Adding object package
+- have container entrypoint run repl
+- Merge pull request #5 from CryptoRodeo/update-repl
+- add error message banana cause why not
+- more of an RPPL than a REPL
+- add more notes
+- Merge pull request #4 from CryptoRodeo/call-expressions
+- ensure call expressions have highest precedence
+- assign the correct precedence for lparen token
+- register infix function for lparen, create methods to parse call expressions + arguments
+- add test for parsing call expression parameters
+- like I said, coding at 5am be hard
+- add test for parsing call expressions
+- whoops (coding at 5am be hard)
+- add CallExpression struct
+- add comment
+- update gitignore
+- Merge pull request #3 from CryptoRodeo/function-literals
+- add test for function parameter parsing
+- register and create function literal parsing function
+- fix failing test
+- fix missing function body error
+- add also janky entrypoint shell script
+- add WIP janky Dockerfile
+- update Jenkinsfile formatting
+- update script permissions so Jenkins can run them
+- update Jenkisfile
+- add helper shell scripts
+- update jenkins file
+- still broken...
+- fix pipeline steps
+- add actual steps to pipeline
+- testing local Jenkins server
+- add additional notes
+- test for function literals WIP
+- Add AST node to parse function literals
+- Merge pull request #2 from CryptoRodeo/if-expressions
+- More commentary
+- parse else statements (that was easy...)
+- add parseBlockStatement method to parse If statements
+- typo fix
+- WIP -> add function to parse if expressions
+- small comment change
+- add test for if else expressions
+- Add test for if expressions
+- Add if and block statement AST nodes
+- add additional notes on parser concepts
+- add additional notes on tokens
+- Add Dev Notes on lexer + tokens
+- Merge pull request #1 from CryptoRodeo/grouped-expressions
+- Create and register prefix parsing function for parenthesis
+- Add additional test scenarios to test grouped expressions
+- register prefix parsing functions for boolean values, update parsing functions to use parseExpression
+- Extend test, add function to test boolean literal
+- add test for boolean values. Should fail because of no prefix parse function mapping
+- Add boolean struct so we can start implementing booleans
+- Clean up some tests
+- Add new helper functions to build more generalized tests. update some tests
+- add parser tracer
+- moar notes
+- update some notes.
+- add tests for precedence parsing
+- add infix parsing to parseExpression
+- create method to parse infix expression, register tokens to use this method
+- Add notes and initialize map for infix parsing functions
+- Add precedence-helper methods
+- Add precedences table / map
+- Add infix expression AST node + functions
+- (WIP) add test for parsing infix expressions
+- Add more notes for the parsePrefixExpression method
+- Add functionality to parse expressions with prefixes
+- Add prefix expression struct, functions and test
+- Add integer literal struct, parsing function and test
+- Add functions and tests for parsing identifiers.
+- add parsing functions and maps
+- Adding some more notes..
+- Add sample test for parser
+- Add ExpressionStatement struct and String() methods
+- Adding gitignore before moving on
+- Merge branch 'main' of github.com:CryptoRodeo/monke-lang
+- Adding return statement parsing
+- Update README.md
+- Adding initial files
+- Initial commit
