@@ -731,3 +731,34 @@ func TestHashDigging(t *testing.T) {
 		}
 	}
 }
+
+func TestArrayIndexAssignments(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`let arr = ["a", "b", "c"]; arr[0] = 5; arr[0]`, 5},
+		{`let arr = ["tom", "jerry"]; arr[1] = "bombadil"; arr[1]`, "bombadil"},
+		{`let arr = ["Smitty Werbenjagermanjensen","He was number", "two"]; arr[2] = "one"; arr[2]`, "one"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+
+		_, isInt := evaluated.(*object.Integer)
+		expectedInt, expectedIsInt := tt.expected.(int)
+
+		actualString, isString := evaluated.(*object.String)
+		expectedString, expectedIsString := tt.expected.(string)
+
+		if isInt && expectedIsInt {
+			testIntegerObject(t, evaluated, int64(expectedInt))
+		}
+
+		if isString && expectedIsString {
+			if actualString.Value != expectedString {
+				t.Errorf("Expected %s, got %s", tt.expected, evaluated)
+			}
+		}
+	}
+}
