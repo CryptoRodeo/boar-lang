@@ -14,7 +14,7 @@ docker build . -t monke-lang
 
 docker run -it monke-lang --name="monke-lang"
 
-Hello monke, feel free to type in commands
+Hello monke, (use Ctrl+C to exit)
 ~> 
 
 # To exit use Ctrl-C
@@ -24,7 +24,7 @@ You can also just run it regularly (requires go version >= 1.16):
 ```
 go run .
 
-Hello kilgore, feel free to type in commands
+Hello kilgore, (use Ctrl+C to exit)
 ~> 
 ```
 
@@ -126,6 +126,10 @@ Hello World
 4
 ~> x[2]
 3
+~> x[2] = "Hello!"
+Hello!
+~> x
+[1, 2, Hello!]
 ```
 
 **Hash Maps:**
