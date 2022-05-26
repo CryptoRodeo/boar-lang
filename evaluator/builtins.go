@@ -201,7 +201,7 @@ func __valuesAt__(args ...object.Object) object.Object {
 }
 
 func __toArray__(args ...object.Object) object.Object {
-	err := checkForHashErrors(ErrorFormatter{FuncName: "valuesAt", ArgumentsExpected: 1, Arguments: args})
+	err := checkForHashErrors(ErrorFormatter{FuncName: "toArray", ArgumentsExpected: 1, Arguments: args})
 
 	if err != NULL {
 		return err
@@ -221,7 +221,7 @@ func __toArray__(args ...object.Object) object.Object {
 }
 
 func __dig__(args ...object.Object) object.Object {
-	err := checkForHashErrors(ErrorFormatter{FuncName: "valuesAt", ArgumentsExpected: 2, Arguments: args})
+	err := checkForHashErrors(ErrorFormatter{FuncName: "dig", ArgumentsExpected: 2, Arguments: args})
 
 	if err != NULL {
 		return err
