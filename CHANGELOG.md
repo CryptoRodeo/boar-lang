@@ -1,3 +1,7 @@
+- refactor slice creation in __dig__
+- Remove redundent structs, use new hash builtin method error checker
+- prepare hash builtin method error checker
+- add CHANGELOG file
 - fix README.md example
 - Merge pull request #8 from CryptoRodeo/hash-improvements
 - update README.md
