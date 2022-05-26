@@ -496,6 +496,7 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 }
 
 func evalIndexAssignment(hash, index, value object.Object) object.Object {
+	// TODO - make this work for arrays as well
 	indexable := hash.(*object.Hash)
 
 	key, ok := index.(object.Hashable)
