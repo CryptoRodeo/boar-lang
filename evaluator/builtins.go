@@ -248,9 +248,7 @@ func __dig__(args ...object.Object) object.Object {
 			return extracted.Value
 		}
 
-		newArgs := []object.Object{}
-		newArgs = append(newArgs, extracted.Value)
-		newArgs = append(newArgs, args[2:]...)
+		newArgs := append([]object.Object{extracted.Value}, args[2:]...)
 
 		return __dig__(newArgs...)
 	}
