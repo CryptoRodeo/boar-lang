@@ -14,6 +14,6 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Hello %s, feel free to type in commands\n", user.Username)
+	fmt.Printf("Hello %s, (use Ctrl+C to exit)\n", user.Username)
 	repl.Start(os.Stdin, os.Stdout)
 }
