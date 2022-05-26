@@ -5,15 +5,9 @@ import (
 	"monkey/object"
 )
 
-type ArrayErrorFormatter struct {
+type ErrorFormatter struct {
 	FuncName          string
-	ArgumentsExpected int
-	Arguments         []object.Object
-}
-
-type HashErrorFormatter struct {
-	FuncName          string
-	ArugmentsExpected int
+	ArgumentsExpected int //minimum arguments expected
 	Arguments         []object.Object
 }
 
@@ -31,7 +25,7 @@ var builtins = map[string]*object.Builtin{
 	"dig":      {Fn: __dig__},
 }
 
-func checkForArrayErrors(formatter ArrayErrorFormatter) object.Object {
+func checkForArrayErrors(formatter ErrorFormatter) object.Object {
 	args := formatter.Arguments
 	functionName := formatter.FuncName
 	argumentsExpected := formatter.ArgumentsExpected
@@ -66,7 +60,7 @@ func __len__(args ...object.Object) object.Object {
 }
 
 func __first__(args ...object.Object) object.Object {
-	err := checkForArrayErrors(ArrayErrorFormatter{FuncName: "first", ArgumentsExpected: 1, Arguments: args})
+	err := checkForArrayErrors(ErrorFormatter{FuncName: "first", ArgumentsExpected: 1, Arguments: args})
 
 	if err != NULL {
 		return err
@@ -82,7 +76,7 @@ func __first__(args ...object.Object) object.Object {
 }
 
 func __last__(args ...object.Object) object.Object {
-	err := checkForArrayErrors(ArrayErrorFormatter{FuncName: "last", ArgumentsExpected: 1, Arguments: args})
+	err := checkForArrayErrors(ErrorFormatter{FuncName: "last", ArgumentsExpected: 1, Arguments: args})
 
 	if err != NULL {
 		return err
@@ -104,7 +98,7 @@ func __last__(args ...object.Object) object.Object {
 - Similar to the cdr function in Scheme (also similar to tail)
 **/
 func __rest__(args ...object.Object) object.Object {
-	err := checkForArrayErrors(ArrayErrorFormatter{FuncName: "rest", ArgumentsExpected: 1, Arguments: args})
+	err := checkForArrayErrors(ErrorFormatter{FuncName: "rest", ArgumentsExpected: 1, Arguments: args})
 
 	if err != NULL {
 		return err
@@ -129,7 +123,7 @@ func __rest__(args ...object.Object) object.Object {
 - Arrays are immutable in monke-lang, so it doesn't modify the given array
 **/
 func __push__(args ...object.Object) object.Object {
-	err := checkForArrayErrors(ArrayErrorFormatter{FuncName: "push", ArgumentsExpected: 2, Arguments: args})
+	err := checkForArrayErrors(ErrorFormatter{FuncName: "push", ArgumentsExpected: 2, Arguments: args})
 
 	if err != NULL {
 		return err
@@ -154,12 +148,14 @@ func __puts__(args ...object.Object) object.Object {
 }
 
 func __delete__(args ...object.Object) object.Object {
-	// First argument must be a hash
-	hash, ok := args[0].(*object.Hash)
+	err := checkForHashErrors(ErrorFormatter{FuncName: "delete", ArgumentsExpected: 2, Arguments: args})
 
-	if !ok {
-		return newError("argument to 'delete must be HASH, got %s instead.", args[0].Type())
+	if err != NULL {
+		return err
 	}
+
+	// First argument must be a hash
+	hash := args[0].(*object.Hash)
 
 	// The remaining arguments should be valid hash keys.
 	// Loop through them and null their values
@@ -177,12 +173,14 @@ func __delete__(args ...object.Object) object.Object {
 }
 
 func __valuesAt__(args ...object.Object) object.Object {
-	// First argument must be a hash
-	hash, ok := args[0].(*object.Hash)
+	err := checkForHashErrors(ErrorFormatter{FuncName: "valuesAt", ArgumentsExpected: 2, Arguments: args})
 
-	if !ok {
-		return newError("argument to 'delete must be HASH, got %s instead.", args[0].Type())
+	if err != NULL {
+		return err
 	}
+
+	// First argument must be a hash
+	hash := args[0].(*object.Hash)
 
 	// Create array object to store object values at x key
 	arr := &object.Array{}
@@ -203,12 +201,14 @@ func __valuesAt__(args ...object.Object) object.Object {
 }
 
 func __toArray__(args ...object.Object) object.Object {
-	// First argument must be a hash
-	hash, ok := args[0].(*object.Hash)
+	err := checkForHashErrors(ErrorFormatter{FuncName: "valuesAt", ArgumentsExpected: 1, Arguments: args})
 
-	if !ok {
-		return newError("argument to 'delete must be HASH, got %s instead.", args[0].Type())
+	if err != NULL {
+		return err
 	}
+
+	// First argument must be a hash
+	hash := args[0].(*object.Hash)
 
 	// Create array object to store object values at x key
 	arr := &object.Array{}
@@ -221,17 +221,14 @@ func __toArray__(args ...object.Object) object.Object {
 }
 
 func __dig__(args ...object.Object) object.Object {
+	err := checkForHashErrors(ErrorFormatter{FuncName: "valuesAt", ArgumentsExpected: 2, Arguments: args})
 
-	if len(args) == 0 {
-		return newError("`dig` requires at least 2 arguments: a HASH and a key to search for.")
+	if err != NULL {
+		return err
 	}
 
 	// First argument must be a hash
-	hash, ok := args[0].(*object.Hash)
-
-	if !ok {
-		return newError("Argument to `dig` must be HASH, got %s instead.", args[0].Type())
-	}
+	hash := args[0].(*object.Hash)
 
 	if len(args) == 1 {
 		return hash
@@ -261,10 +258,10 @@ func __dig__(args ...object.Object) object.Object {
 	return nil
 }
 
-func checkForHashErrors(formatter ArrayErrorFormatter) object.Object {
+func checkForHashErrors(formatter ErrorFormatter) object.Object {
 	args, functionName, argumentsExpected := formatter.Arguments, formatter.FuncName, formatter.ArgumentsExpected
 
-	if len(args) != argumentsExpected {
+	if len(args) < argumentsExpected {
 		return newError("wrong number of arguments, got %d wanted %d", len(args), argumentsExpected)
 	}
 
