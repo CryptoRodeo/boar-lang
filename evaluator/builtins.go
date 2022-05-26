@@ -11,6 +11,12 @@ type ArrayErrorFormatter struct {
 	Arguments         []object.Object
 }
 
+type HashErrorFormatter struct {
+	FuncName          string
+	ArugmentsExpected int
+	Arguments         []object.Object
+}
+
 var builtins = map[string]*object.Builtin{
 	//len()
 	"len":      {Fn: __len__},
@@ -253,4 +259,18 @@ func __dig__(args ...object.Object) object.Object {
 	}
 
 	return nil
+}
+
+func checkForHashErrors(formatter ArrayErrorFormatter) object.Object {
+	args, functionName, argumentsExpected := formatter.Arguments, formatter.FuncName, formatter.ArgumentsExpected
+
+	if len(args) != argumentsExpected {
+		return newError("wrong number of arguments, got %d wanted %d", len(args), argumentsExpected)
+	}
+
+	if !isHash(args[0]) {
+		return newError("argument to `%s` must be HASH, got %s", functionName, args[0].Type())
+	}
+
+	return NULL
 }
