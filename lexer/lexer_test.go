@@ -43,6 +43,7 @@ func TestNextToken(t *testing.T) {
 
 	[1,2];
 	{"foo": "bar"}
+	hash["a"] = 2
 	`
 	// Lets make sure we get back the correct tokens based on our input.
 	tests := []struct {
@@ -135,6 +136,12 @@ func TestNextToken(t *testing.T) {
 		{token.COLON, ":"},
 		{token.STRING, "bar"},
 		{token.RBRACE, "}"},
+		{token.IDENT, "hash"},
+		{token.LBRACKET, "["},
+		{token.STRING, "a"},
+		{token.RBRACKET, "]"},
+		{token.ASSIGN, "="},
+		{token.INT, "2"},
 		{token.EOF, ""},
 	}
 	// Create a new lexer

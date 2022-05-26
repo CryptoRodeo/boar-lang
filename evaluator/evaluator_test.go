@@ -587,3 +587,147 @@ func TestHashIndexExpressions(t *testing.T) {
 		}
 	}
 }
+
+func TestHashAssignments(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{`let hash = {"a": 2 }; hash["a"] = 5; hash["a"]`, 5},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer := tt.expected
+		testIntegerObject(t, evaluated, integer)
+	}
+}
+
+func TestHashKeyDeletions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`let hash = {"a": 2 }; delete(hash, "a"); hash["a"]`, nil},
+		{`let hash = {"a": 2, "b": 3 }; delete(hash, "b"); hash["b"]`, nil},
+		{`let hash = {"a": 2, "b":3, "c": 4 }; delete(hash, "a", "b"); hash["c"]`, 4},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
+}
+
+func TestHashValueRetrieval(t *testing.T) {
+	expected_results := [][]interface{}{
+		{2},
+		{2, 3},
+		{2, nil},
+		{nil, nil, nil},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let hash = {"a": 2 }; valuesAt(hash, "a");`, expected_results[0]},
+		{`let hash = {"a": 2, "b": 3 };  valuesAt(hash, "a", "b")`, expected_results[1]},
+		{`let hash = {"a": 2, "b": 3 }; delete(hash, "b"); valuesAt(hash,"a","b") `, expected_results[2]},
+		{`let hash = {"a": 2, "b":3, "c": 4 }; delete(hash, "a", "b", "x"); valuesAt(hash, "a","b","c")`, expected_results[3]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testArrayValues(t, evaluated, tt.expected)
+	}
+}
+
+func testArrayValues(t *testing.T, evaluated object.Object, expected []interface{}) bool {
+	result, ok := evaluated.(*object.Array)
+
+	if !ok {
+		t.Errorf("object is not an Array, got %T (%+v)", evaluated, evaluated)
+		return false
+	}
+
+	for _, val := range expected {
+		if !contains(result.Elements, val) {
+			t.Errorf("Value not found in array: %s", val)
+			return false
+		}
+	}
+	return true
+}
+
+func contains(array []object.Object, value interface{}) bool {
+	for _, val := range array {
+		// convert objects to their types so we can correctly compare values
+		intVal, _ := value.(int)
+		intObject, isInteger := val.(*object.Integer)
+		if isInteger && intObject.Value == int64(intVal) {
+			return true
+		}
+
+		_, isNull := val.(*object.Null)
+		if isNull && value == nil {
+			return true
+		}
+
+		stringVal, _ := value.(string)
+		stringObject, isString := val.(*object.String)
+		if isString && stringObject.Value == stringVal {
+			return true
+		}
+	}
+	return false
+}
+
+func TestHashToArrayConversion(t *testing.T) {
+	expected_results := [][]interface{}{
+		{"a", 2},
+		{"a", 2, "b", 3},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let hash = {"a": 2 }; toArray(hash)`, expected_results[0]},
+		{`let hash = {"a": 2, "b": 3 };  toArray(hash)`, expected_results[1]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testArrayValues(t, evaluated, tt.expected)
+	}
+}
+
+func TestHashDigging(t *testing.T) {
+	expected_results := []string{
+		"yellow boots",
+	}
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{`let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } }; dig(person, "clothes", "shoes");`, expected_results[0]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		val, ok := evaluated.(*object.String)
+
+		if !ok {
+			t.Errorf("object is not String, got %T (%+v)", val, val)
+		}
+
+		if val.Value != tt.expected {
+			t.Errorf("Invalid value returned, expected: %s , got: %s", tt.expected, val)
+		}
+	}
+}
