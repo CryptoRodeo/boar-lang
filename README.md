@@ -150,7 +150,7 @@ John
 {name: John, null: null}
 ~> person["age"]
 null
-let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } };
+~> let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } };
 ~> dig(person, "clothes", "shoes")
 yellow boots
 
