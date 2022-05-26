@@ -20,7 +20,7 @@ Hello monke, feel free to type in commands
 # To exit use Ctrl-C
 ```
 
-You can also just run it regularly:
+You can also just run it regularly (requires <= go 1.16):
 ```
 go run .
 
@@ -150,6 +150,9 @@ John
 {name: John, null: null}
 ~> person["age"]
 null
+let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } };
+~> dig(person, "clothes", "shoes")
+yellow boots
 
 ```
 ## Implementation Details:
