@@ -495,10 +495,22 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 	return pair.Value
 }
 
-func evalIndexAssignment(hash, index, value object.Object) object.Object {
-	// TODO - make this work for arrays as well
-	indexable := hash.(*object.Hash)
+func evalIndexAssignment(indexable, index, value object.Object) object.Object {
+	hash, isHash := indexable.(*object.Hash)
+	array, isArray := indexable.(*object.Array)
 
+	if isHash {
+		return evalHashKeyAssignment(hash, index, value)
+	}
+
+	if isArray {
+		return evalArrayIndexAssignment(array, index, value)
+	}
+
+	return newError("Invalid type passed, expected a type of Hash or Array, got %T instead", indexable.Type())
+}
+
+func evalHashKeyAssignment(hash *object.Hash, index, value object.Object) object.Object {
 	key, ok := index.(object.Hashable)
 
 	if !ok {
@@ -507,7 +519,19 @@ func evalIndexAssignment(hash, index, value object.Object) object.Object {
 
 	hashed_key := key.HashKey()
 
-	indexable.Pairs[hashed_key] = object.HashPair{Key: index, Value: value}
+	hash.Pairs[hashed_key] = object.HashPair{Key: index, Value: value}
+
+	return value
+}
+
+func evalArrayIndexAssignment(array *object.Array, index, value object.Object) object.Object {
+	idx, ok := index.(*object.Integer)
+
+	if !ok {
+		return newError("Invalid index value passed, expected an integer, got: %T", index.Type())
+	}
+
+	array.Elements[idx.Value] = value
 
 	return value
 }
