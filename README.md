@@ -20,7 +20,7 @@ Hello monke, feel free to type in commands
 # To exit use Ctrl-C
 ```
 
-You can also just run it regularly (requires <= go 1.16):
+You can also just run it regularly (requires go version >= 1.16):
 ```
 go run .
 
