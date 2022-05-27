@@ -15,9 +15,22 @@ const PROMPT = "~> "
 
 const BEAR = `ʕ•ᴥ•ʔ`
 
-func Start(in io.Reader, out io.Writer) {
+func setup(in io.Reader, out io.Writer) (*bufio.Scanner, *object.Environment) {
 	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
+	loadBuiltInMethods(env)
+
+	return scanner, env
+}
+
+func loadBuiltInMethods(env *object.Environment) {
+	for key, value := range evaluator.BUILTIN {
+		env.Set(key, value)
+	}
+}
+
+func Start(in io.Reader, out io.Writer) {
+	scanner, env := setup(in, out)
 
 	// Loop forever, until we exit
 	for {
