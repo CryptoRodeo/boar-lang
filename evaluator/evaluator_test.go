@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"monkey/lexer"
 	"monkey/object"
 	"monkey/parser"
@@ -35,11 +36,18 @@ func TestEvalIntegerExpression(t *testing.T) {
 	}
 }
 
+func loadBuiltInMethods(env *object.Environment) {
+	for key, value := range BUILTIN {
+		env.Set(key, value)
+	}
+}
+
 func testEval(input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
 	env := object.NewEnvironment()
+	loadBuiltInMethods(env)
 
 	return Eval(program, env)
 }
@@ -766,16 +774,31 @@ func TestArrayIndexAssignments(t *testing.T) {
 func TestArrayMapFunction(t *testing.T) {
 	expectedResults := [][]interface{}{
 		{3, 4, 5},
+		{4, 8, 12},
 	}
 	tests := []struct {
 		input    string
 		expected []interface{}
 	}{
-		{`let arr = [1,2,3,]; let addTwo = func(x) { x + 2 }; let arr = map(arr, func); arr`, expectedResults[0]},
+		{`let arr = [1,2,3]; let addTwo = fn(x) { x + 2; }; let arr = map(arr, addTwo); arr`, expectedResults[0]},
+		{`let arr = [2,4,6]; let multiplyTwo = fn(x) { x * 2; }; let arr = map(arr, multiplyTwo); arr`, expectedResults[1]},
 	}
 
 	for _, tt := range tests {
 		evaluated := testEval(tt.input)
+		arr, isArray := evaluated.(*object.Array)
+
+		if !isArray {
+			t.Errorf("Expected an Array returned, got %T instead", arr.Type())
+		}
+
+		for _, val := range tt.expected {
+			if !contains(arr.Elements, val) {
+				t.Errorf("Invalid value found in array, expected to find: %s", val)
+			}
+		}
+
+		fmt.Println(evaluated)
 		//TODO - Finish map test
 	}
 }
