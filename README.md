@@ -129,6 +129,11 @@ Hello World
 Hello!
 ~> x
 [1, 2, Hello!]
+~> let arr = [1,2,3]
+~> let addTwo = fn(x) { x + 2; }
+~> let res = map(arr, addTwo)
+~> res
+[3, 4, 5]
 ```
 
 **Hash Maps:**
