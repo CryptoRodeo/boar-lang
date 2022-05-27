@@ -762,3 +762,20 @@ func TestArrayIndexAssignments(t *testing.T) {
 		}
 	}
 }
+
+func TestArrayMapFunction(t *testing.T) {
+	expectedResults := [][]interface{}{
+		{3, 4, 5},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let arr = [1,2,3,]; let addTwo = func(x) { x + 2 }; let arr = map(arr, func); arr`, expectedResults[0]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		//TODO - Finish map test
+	}
+}
