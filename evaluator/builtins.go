@@ -23,6 +23,7 @@ var builtins = map[string]*object.Builtin{
 	"valuesAt": {Fn: __valuesAt__},
 	"toArray":  {Fn: __toArray__},
 	"dig":      {Fn: __dig__},
+	"map":      {Fn: __map__},
 }
 
 func checkForArrayErrors(formatter ErrorFormatter) object.Object {
@@ -253,6 +254,11 @@ func __dig__(args ...object.Object) object.Object {
 		return __dig__(newArgs...)
 	}
 
+	return nil
+}
+
+func __map__(args ...object.Object) object.Object {
+	// TODO - make this work
 	return nil
 }
 
