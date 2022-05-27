@@ -17,7 +17,6 @@ docker run -it monke-lang --name="monke-lang"
 Hello monke, (use Ctrl+C to exit)
 ~> 
 
-# To exit use Ctrl-C
 ```
 
 You can also just run it regularly (requires go version >= 1.16):
