@@ -1,7 +1,6 @@
 package evaluator
 
 import (
-	"fmt"
 	"monkey/lexer"
 	"monkey/object"
 	"monkey/parser"
@@ -797,8 +796,5 @@ func TestArrayMapFunction(t *testing.T) {
 				t.Errorf("Invalid value found in array, expected to find: %s", val)
 			}
 		}
-
-		fmt.Println(evaluated)
-		//TODO - Finish map test
 	}
 }
