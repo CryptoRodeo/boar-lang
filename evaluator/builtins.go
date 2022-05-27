@@ -11,7 +11,7 @@ type ErrorFormatter struct {
 	Arguments         []object.Object
 }
 
-var builtins = map[string]*object.Builtin{
+var BUILTIN = map[string]*object.Builtin{
 	//len()
 	"len":      {Fn: __len__},
 	"first":    {Fn: __first__},
@@ -258,8 +258,22 @@ func __dig__(args ...object.Object) object.Object {
 }
 
 func __map__(args ...object.Object) object.Object {
-	// TODO - make this work
-	return nil
+	err := checkForArrayErrors(ErrorFormatter{FuncName: "map", ArgumentsExpected: 2, Arguments: args})
+
+	if err != NULL {
+		return err
+	}
+
+	//Grab the function from the args
+	function, exists := args[1].(*object.Function)
+	// remove the function from the list, so now we should only have the array arg
+	args = args[0:1]
+
+	if !exists {
+		return newError("second arguments to `map` should be a function, got %T instead", function.Type())
+	}
+
+	return applyFunction(function, args)
 }
 
 func checkForHashErrors(formatter ErrorFormatter) object.Object {
