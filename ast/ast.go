@@ -416,3 +416,31 @@ func (hl *HashLiteral) String() string {
 
 	return out.String()
 }
+
+type InternalFunctionCall struct {
+	Token      token.Token // the '.' token
+	CallerType string      // Array, Hash
+	Function   Expression  // idenfifier or function literal
+	Arguments  []Expression
+}
+
+func (ifc *InternalFunctionCall) expressionNode()      {}
+func (ifc *InternalFunctionCall) TokenLiteral() string { return ifc.Token.Literal }
+func (ifc *InternalFunctionCall) String() string {
+	var out bytes.Buffer
+
+	args := []string{}
+
+	for _, a := range ifc.Arguments {
+		args = append(args, a.String())
+	}
+
+	out.WriteString(ifc.CallerType)        //Array, Hash
+	out.WriteString(ifc.Token.Literal)     // .
+	out.WriteString(ifc.Function.String()) // delete, pop
+	out.WriteString("(")
+	out.WriteString(strings.Join(args, ", ")) // args
+	out.WriteString(")")
+
+	return out.String()
+}
