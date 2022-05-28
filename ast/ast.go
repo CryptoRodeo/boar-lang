@@ -418,10 +418,11 @@ func (hl *HashLiteral) String() string {
 }
 
 type InternalFunctionCall struct {
-	Token      token.Token // the '.' token
-	CallerType string      // Array, Hash
-	Function   Expression  // idenfifier or function literal
-	Arguments  []Expression
+	Token              token.Token  // the '.' token
+	CallerIdentifier   *Identifier  //someArray, someHash, etc
+	CallerType         string       // Array, Hash
+	FunctionIdentifier *Identifier  // pop, delete, etc.
+	Arguments          []Expression //(1,2,3), (), etc.
 }
 
 func (ifc *InternalFunctionCall) expressionNode()      {}
@@ -435,9 +436,9 @@ func (ifc *InternalFunctionCall) String() string {
 		args = append(args, a.String())
 	}
 
-	out.WriteString(ifc.CallerType)        //Array, Hash
-	out.WriteString(ifc.Token.Literal)     // .
-	out.WriteString(ifc.Function.String()) // delete, pop
+	out.WriteString(ifc.CallerIdentifier.String())   //Array, Hash
+	out.WriteString(ifc.Token.Literal)               // .
+	out.WriteString(ifc.FunctionIdentifier.String()) // delete, pop
 	out.WriteString("(")
 	out.WriteString(strings.Join(args, ", ")) // args
 	out.WriteString(")")
