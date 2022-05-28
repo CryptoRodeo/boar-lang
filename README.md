@@ -171,6 +171,8 @@ Hello!
 ~> let firstName = shift(tb)
 ~> firstName
 Tom
+~> tb
+[Bombadil]
 ```
 
 **Hash Maps:**
