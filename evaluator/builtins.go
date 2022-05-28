@@ -25,6 +25,7 @@ var BUILTIN = map[string]*object.Builtin{
 	"dig":      {Fn: __dig__},
 	"map":      {Fn: __map__},
 	"pop":      {Fn: __pop__},
+	"shift":    {Fn: __shift__},
 }
 
 func checkForArrayErrors(formatter ErrorFormatter) object.Object {
@@ -289,6 +290,22 @@ func __pop__(args ...object.Object) object.Object {
 	val := arr.Elements[len(arr.Elements)-1]
 
 	arr.Elements = arr.Elements[0 : len(arr.Elements)-1]
+
+	return val
+}
+
+func __shift__(args ...object.Object) object.Object {
+	err := checkForArrayErrors(ErrorFormatter{FuncName: "shift", ArgumentsExpected: 1, Arguments: args})
+
+	if err != NULL {
+		return err
+	}
+
+	arr := args[0].(*object.Array)
+
+	val := arr.Elements[0]
+
+	arr.Elements = arr.Elements[1:]
 
 	return val
 }
