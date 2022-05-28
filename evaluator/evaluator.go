@@ -152,6 +152,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
 
+	case *ast.InternalFunctionCall:
+		fmt.Println(node)
+		// return evalHashLiteral(node, env)
+
 	}
 
 	return nil
