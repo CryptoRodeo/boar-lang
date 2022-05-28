@@ -1022,3 +1022,49 @@ func TestParsingHashLiteralsWithExpressions(t *testing.T) {
 		testFunc(value)
 	}
 }
+
+func TestParsingInternalFunctionCalls(t *testing.T) {
+	input := "arr.slice(1,2)"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Body does not contain %d statements. got=%d\n", 1, len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T", program.Statements[0])
+	}
+
+	ifc, ok := stmt.Expression.(*ast.InternalFunctionCall)
+
+	if !ok {
+		t.Fatalf("exp not *ast.InternalFunctionCall, got %T", stmt.Expression)
+	}
+
+	if ifc.Token.Literal != "." {
+		t.Fatalf("Invalid token for *ast.InternalFunctionCall, expected '%s', got '%s'", ".", ifc.Token.Literal)
+	}
+
+	if !testIdentifier(t, ifc.CallerIdentifier, "arr") {
+		t.Fatalf("Invalid identifier, expected %s, got %s", "arr", ifc.CallerIdentifier)
+	}
+
+	if !testIdentifier(t, ifc.FunctionIdentifier, "slice") {
+		t.Fatalf("Invalid identifier, expected %s, got %s", "slice", ifc.CallerIdentifier)
+	}
+
+	if len(ifc.Arguments) != 2 {
+		t.Fatalf("wrong number of arguments. wanted %d, got %d", 2, len(ifc.Arguments))
+	}
+
+	one, two := ifc.Arguments[0], ifc.Arguments[1]
+
+	testIntegerLiteral(t, one, 1)
+	testIntegerLiteral(t, two, 2)
+}
