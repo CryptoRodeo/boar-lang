@@ -13,7 +13,6 @@ const (
 	IDENT  = "IDENT" // add, foobar, x, y, etc.
 	INT    = "INT"   // 123456
 	STRING = "STRING"
-	DOT    = "."
 
 	// Operators
 	ASSIGN   = "="
@@ -31,6 +30,7 @@ const (
 	COMMA     = ","
 	SEMICOLON = ";"
 	COLON     = ":"
+	DOT       = "."
 
 	//parenthesis + brackets
 	LPAREN   = "("
