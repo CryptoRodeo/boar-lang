@@ -392,10 +392,9 @@ func applyMapCall(arr *object.Array, fn *object.Function) object.Object {
 		args := []object.Object{val}
 		// create an inner function scope for each function call
 		extendedEnv := extendFunctionEnv(fn, args)
-		//evalute the function body with the inner scope
+		// Evaluate
 		evaluated := Eval(fn.Body, extendedEnv)
-		// if the object has a return value, return that value
-		// else, return the object.
+		// Add result to the array
 		res.Elements = append(res.Elements, unwrapReturnValue(evaluated))
 	}
 	return res
