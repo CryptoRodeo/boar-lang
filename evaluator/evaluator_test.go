@@ -833,9 +833,70 @@ func TestArrayPopFunctionReturn(t *testing.T) {
 		input    string
 		expected interface{}
 	}{
-		{`let arr = [1,2,3]; pop(arr); arr`, 3},
-		{`let arr = [2,4,6]; pop(arr); arr`, 6},
+		{`let arr = [1,2,3]; pop(arr);`, 3},
+		{`let arr = [2,4,6]; pop(arr);`, 6},
 		{`let arr = ["Frodo", "Baggins"]; pop(arr);`, "Baggins"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, isInt := evaluated.(*object.Integer)
+		expectedInt, expectedIsInt := tt.expected.(int)
+
+		if isInt && expectedIsInt {
+			testIntegerObject(t, integer, int64(expectedInt))
+		}
+
+		stringObj, isString := evaluated.(*object.String)
+
+		expectedString, expectedIsString := tt.expected.(string)
+
+		if isString && expectedIsString {
+			if expectedString != stringObj.Value {
+				t.Errorf("Invalid string value returned from Array#pop, expected to find: %s, got: %s instead", tt.expected, stringObj.Value)
+			}
+		}
+	}
+}
+
+func TestArrayShiftFunction(t *testing.T) {
+	expectedResults := [][]interface{}{
+		{2, 3},
+		{4, 6},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let arr = [1,2,3]; shift(arr); arr`, expectedResults[0]},
+		{`let arr = [2,4,6]; shift(arr); arr`, expectedResults[1]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		evaluated.Inspect()
+		arr, isArray := evaluated.(*object.Array)
+
+		if !isArray {
+			t.Errorf("Expected an Array returned, got %T instead", arr.Type())
+		}
+
+		for _, val := range tt.expected {
+			if !contains(arr.Elements, val) {
+				t.Errorf("Invalid value found in array, expected to find: %s", val)
+			}
+		}
+	}
+}
+
+func TestArrayShiftFunctionReturn(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`let arr = [1,2,3]; shift(arr);`, 1},
+		{`let arr = [2,4,6]; shift(arr);`, 2},
+		{`let arr = ["Frodo", "Baggins"]; shift(arr);`, "Frodo"},
 	}
 
 	for _, tt := range tests {
