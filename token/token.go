@@ -13,6 +13,7 @@ const (
 	IDENT  = "IDENT" // add, foobar, x, y, etc.
 	INT    = "INT"   // 123456
 	STRING = "STRING"
+	PERIOD = "."
 
 	// Operators
 	ASSIGN   = "="
