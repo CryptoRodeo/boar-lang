@@ -2,6 +2,14 @@
 > "[Reject humanity, return to monke](https://knowyourmeme.com/memes/return-to-monke)" 🐒
 
 Go-based language interpreter for a toy programming language called "monke" (pronounced "monk")
+
+Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbook.com/) with some extra improvements, such as:
+- Additional built in functions for the Hash and Array objects (inspired from other languages such as Ruby)
+- Index reassignment for Arrays and Hashes
+- Base project refactors
+- Additional dev notes for each interpreter component
+- Other features that are currently a WIP
+
 ## Quick Start Guide:
 
 The recommended way is to use Docker:
