@@ -173,6 +173,15 @@ Hello!
 Tom
 ~> tb
 [Bombadil]
+
+::Array#slice
+~> let animals = ["ant", "bison", "camel", "duck", "elephant"];
+~> slice(animals, 2)
+[camel, duck, elephant]
+~> slice(animals, 2, 4)
+[camel, duck]
+~> slice(animals)
+[ant, bison, camel, duck, elephant]
 ```
 
 **Hash Maps:**
