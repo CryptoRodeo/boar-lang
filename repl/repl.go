@@ -15,6 +15,8 @@ const PROMPT = "~> "
 
 const BEAR = `ʕ•ᴥ•ʔ`
 
+// Creates a new scanner, object environment and preloads
+// built in functions into the global environment
 func setup(in io.Reader, out io.Writer) (*bufio.Scanner, *object.Environment) {
 	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
