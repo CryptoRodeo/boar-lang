@@ -827,3 +827,34 @@ func TestArrayPopFunction(t *testing.T) {
 		}
 	}
 }
+
+func TestArrayPopFunctionReturn(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`let arr = [1,2,3]; pop(arr); arr`, 3},
+		{`let arr = [2,4,6]; pop(arr); arr`, 6},
+		{`let arr = ["Frodo", "Baggins"]; pop(arr);`, "Baggins"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, isInt := evaluated.(*object.Integer)
+		expectedInt, expectedIsInt := tt.expected.(int)
+
+		if isInt && expectedIsInt {
+			testIntegerObject(t, integer, int64(expectedInt))
+		}
+
+		stringObj, isString := evaluated.(*object.String)
+
+		expectedString, expectedIsString := tt.expected.(string)
+
+		if isString && expectedIsString {
+			if expectedString != stringObj.Value {
+				t.Errorf("Invalid string value returned from Array#pop, expected to find: %s, got: %s instead", tt.expected, stringObj.Value)
+			}
+		}
+	}
+}
