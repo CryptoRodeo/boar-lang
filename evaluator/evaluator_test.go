@@ -798,3 +798,32 @@ func TestArrayMapFunction(t *testing.T) {
 		}
 	}
 }
+
+func TestArrayPopFunction(t *testing.T) {
+	expectedResults := [][]interface{}{
+		{1, 2},
+		{2, 4},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let arr = [1,2,3]; pop(arr); arr`, expectedResults[0]},
+		{`let arr = [2,4,6]; pop(arr); arr`, expectedResults[1]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		arr, isArray := evaluated.(*object.Array)
+
+		if !isArray {
+			t.Errorf("Expected an Array returned, got %T instead", arr.Type())
+		}
+
+		for _, val := range tt.expected {
+			if !contains(arr.Elements, val) {
+				t.Errorf("Invalid value found in array, expected to find: %s", val)
+			}
+		}
+	}
+}
