@@ -24,6 +24,7 @@ var BUILTIN = map[string]*object.Builtin{
 	"toArray":  {Fn: __toArray__},
 	"dig":      {Fn: __dig__},
 	"map":      {Fn: __map__},
+	"pop":      {Fn: __pop__},
 }
 
 func checkForArrayErrors(formatter ErrorFormatter) object.Object {
@@ -31,7 +32,7 @@ func checkForArrayErrors(formatter ErrorFormatter) object.Object {
 	functionName := formatter.FuncName
 	argumentsExpected := formatter.ArgumentsExpected
 	if len(args) != argumentsExpected {
-		return newError("wrong number of arguments, got %d wanted %d", len(args), argumentsExpected)
+		return newError("wrong number of arguments passed to %s. Got %d wanted %d", functionName, len(args), argumentsExpected)
 	}
 
 	if !isArray(args[0]) {
@@ -274,6 +275,22 @@ func __map__(args ...object.Object) object.Object {
 	}
 
 	return applyFunction(function, args)
+}
+
+func __pop__(args ...object.Object) object.Object {
+	err := checkForArrayErrors(ErrorFormatter{FuncName: "pop", ArgumentsExpected: 1, Arguments: args})
+
+	if err != NULL {
+		return err
+	}
+
+	arr := args[0].(*object.Array)
+
+	val := arr.Elements[len(arr.Elements)-1]
+
+	arr.Elements = arr.Elements[0 : len(arr.Elements)-1]
+
+	return val
 }
 
 func checkForHashErrors(formatter ErrorFormatter) object.Object {
