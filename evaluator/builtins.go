@@ -26,13 +26,14 @@ var BUILTIN = map[string]*object.Builtin{
 	"map":      {Fn: __map__},
 	"pop":      {Fn: __pop__},
 	"shift":    {Fn: __shift__},
+	"slice":    {Fn: __slice__},
 }
 
 func checkForArrayErrors(formatter ErrorFormatter) object.Object {
 	args := formatter.Arguments
 	functionName := formatter.FuncName
 	argumentsExpected := formatter.ArgumentsExpected
-	if len(args) != argumentsExpected {
+	if len(args) > argumentsExpected {
 		return newError("wrong number of arguments passed to %s. Got %d wanted %d", functionName, len(args), argumentsExpected)
 	}
 
@@ -308,6 +309,57 @@ func __shift__(args ...object.Object) object.Object {
 	arr.Elements = arr.Elements[1:]
 
 	return val
+}
+
+func __slice__(args ...object.Object) object.Object {
+	err := checkForArrayErrors(ErrorFormatter{FuncName: "slice", ArgumentsExpected: 3, Arguments: args})
+
+	if err != NULL {
+		return err
+	}
+
+	if len(args) > 3 {
+		return newError("Too many values passed to `slice`, expected 3 at most, got %d instead", len(args))
+	}
+
+	arr := args[0].(*object.Array)
+	arrCopy := &object.Array{Elements: arr.Elements[:]}
+
+	// If its just an array, return a copy of the array
+	if len(args[1:]) == 0 {
+		return arrCopy
+	}
+
+	// Make sure all other args are int values
+	for _, arg := range args[1:] {
+		obj, isInt := arg.(*object.Integer)
+
+		if !isInt {
+			return newError("expected an integer, got a type of %T instead", arg.Type())
+		}
+
+		if isInt {
+			if obj.Value < 0 {
+				return newError("Negative indexes not supported (yet), recieved value of %d", obj.Value)
+			}
+		}
+
+	}
+
+	firstIdx := args[1].(*object.Integer).Value
+
+	// two index values passed
+	if len(args) == 3 {
+		secondIdx := args[2].(*object.Integer).Value
+		arrCopy.Elements = arrCopy.Elements[firstIdx:secondIdx]
+
+		return arrCopy
+	}
+
+	//only one index value passed
+	arrCopy.Elements = arrCopy.Elements[firstIdx:]
+
+	return arrCopy
 }
 
 func checkForHashErrors(formatter ErrorFormatter) object.Object {
