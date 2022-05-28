@@ -44,6 +44,7 @@ func TestNextToken(t *testing.T) {
 	[1,2];
 	{"foo": "bar"}
 	hash["a"] = 2
+	arr.pop()
 	`
 	// Lets make sure we get back the correct tokens based on our input.
 	tests := []struct {
@@ -142,6 +143,11 @@ func TestNextToken(t *testing.T) {
 		{token.RBRACKET, "]"},
 		{token.ASSIGN, "="},
 		{token.INT, "2"},
+		{token.IDENT, "arr"},
+		{token.DOT, "."},
+		{token.IDENT, "pop"},
+		{token.LPAREN, "("},
+		{token.RPAREN, ")"},
 		{token.EOF, ""},
 	}
 	// Create a new lexer
