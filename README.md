@@ -165,6 +165,12 @@ Hello!
 [1, 2]
 ~> popVal
 3
+
+::Array#shift
+~> let tb = ["Tom", "Bombadil"]
+~> let firstName = shift(tb)
+~> firstName
+Tom
 ```
 
 **Hash Maps:**
