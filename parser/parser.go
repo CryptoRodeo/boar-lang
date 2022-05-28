@@ -26,13 +26,14 @@ TLDR:
 const (
 	_ int = iota
 	LOWEST
-	EQUALS      // ==
-	LESSGREATER // < or >
-	SUM         // +
-	PRODUCT     // *
-	PREFIX      // -X or !X
-	CALL        // myFunction(x)
-	INDEX       //array[index]
+	EQUALS        // ==
+	LESSGREATER   // < or >
+	SUM           // +
+	PRODUCT       // *
+	PREFIX        // -X or !X
+	CALL          // myFunction(x)
+	INDEX         //array[index]
+	INTERNAL_CALL // arr.pop, hash.delete, etc
 )
 
 /**
@@ -53,6 +54,7 @@ var precedences = map[token.TokenType]int{
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
 	token.LBRACKET: INDEX,
+	token.DOT:      INTERNAL_CALL,
 }
 
 /**
@@ -132,6 +134,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
+	p.registerInfix(token.DOT, p.parseInternalCallExpression)
 
 	return p
 }
@@ -740,6 +743,51 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 	}
 
 	return hash
+}
+
+func (p *Parser) parseInternalCallExpression(left ast.Expression) ast.Expression {
+	// the current token should be '.'
+	if !p.curTokenIs(token.DOT) {
+		return nil
+	}
+
+	dot := p.curToken
+
+	// Grab the identifier: arr, hash, etc.
+	ident, ok := left.(*ast.Identifier)
+
+	if !ok {
+		return nil
+	}
+
+	// We should now be at the function name: pop, delete, etc
+	p.nextToken()
+	internal_function_ident := p.parseIdentifier()
+	func_ident, ok := internal_function_ident.(*ast.Identifier)
+
+	if !ok {
+		return nil
+	}
+
+	//After the function name we should expect a '('
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	// After the '(' we should have either 0 -> expressions
+	args := p.parseExpressionList(token.RPAREN)
+
+	if !ok {
+		return nil
+	}
+
+	ifc := &ast.InternalFunctionCall{
+		CallerIdentifier:   ident,
+		Token:              dot,
+		FunctionIdentifier: func_ident,
+		Arguments:          args,
+	}
+	return ifc
 }
 
 /**
