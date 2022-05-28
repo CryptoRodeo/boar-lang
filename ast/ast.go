@@ -436,11 +436,11 @@ func (ifc *InternalFunctionCall) String() string {
 		args = append(args, a.String())
 	}
 
-	out.WriteString(ifc.CallerIdentifier.String())   //Array, Hash
+	out.WriteString(ifc.CallerIdentifier.String())   //someArray, someHash, etc
 	out.WriteString(ifc.Token.Literal)               // .
 	out.WriteString(ifc.FunctionIdentifier.String()) // delete, pop
 	out.WriteString("(")
-	out.WriteString(strings.Join(args, ", ")) // args
+	out.WriteString(strings.Join(args, ", ")) // (), (1,2,3), ("a", "b", "c"), etc
 	out.WriteString(")")
 
 	return out.String()
