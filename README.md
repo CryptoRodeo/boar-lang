@@ -165,6 +165,7 @@ Hello!
 ~> let person = { "name": "John", "age": (2*15) }
 ~> person
 {age: 30, name: John}
+
 ::Hash#[]
 ~> person["name"]
 John
