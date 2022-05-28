@@ -35,11 +35,18 @@ func TestEvalIntegerExpression(t *testing.T) {
 	}
 }
 
+func loadBuiltInMethods(env *object.Environment) {
+	for key, value := range BUILTIN {
+		env.Set(key, value)
+	}
+}
+
 func testEval(input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
 	env := object.NewEnvironment()
+	loadBuiltInMethods(env)
 
 	return Eval(program, env)
 }
@@ -728,6 +735,219 @@ func TestHashDigging(t *testing.T) {
 
 		if val.Value != tt.expected {
 			t.Errorf("Invalid value returned, expected: %s , got: %s", tt.expected, val)
+		}
+	}
+}
+
+func TestArrayIndexAssignments(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`let arr = ["a", "b", "c"]; arr[0] = 5; arr[0]`, 5},
+		{`let arr = ["tom", "jerry"]; arr[1] = "bombadil"; arr[1]`, "bombadil"},
+		{`let arr = ["Smitty Werbenjagermanjensen","He was number", "two"]; arr[2] = "one"; arr[2]`, "one"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+
+		_, isInt := evaluated.(*object.Integer)
+		expectedInt, expectedIsInt := tt.expected.(int)
+
+		actualString, isString := evaluated.(*object.String)
+		expectedString, expectedIsString := tt.expected.(string)
+
+		if isInt && expectedIsInt {
+			testIntegerObject(t, evaluated, int64(expectedInt))
+		}
+
+		if isString && expectedIsString {
+			if actualString.Value != expectedString {
+				t.Errorf("Expected %s, got %s", tt.expected, evaluated)
+			}
+		}
+	}
+}
+
+func TestArrayMapFunction(t *testing.T) {
+	expectedResults := [][]interface{}{
+		{3, 4, 5},
+		{4, 8, 12},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let arr = [1,2,3]; let addTwo = fn(x) { x + 2; }; let arr = map(arr, addTwo); arr`, expectedResults[0]},
+		{`let arr = [2,4,6]; let multiplyTwo = fn(x) { x * 2; }; let arr = map(arr, multiplyTwo); arr`, expectedResults[1]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		arr, isArray := evaluated.(*object.Array)
+
+		if !isArray {
+			t.Errorf("Expected an Array returned, got %T instead", arr.Type())
+		}
+
+		for _, val := range tt.expected {
+			if !contains(arr.Elements, val) {
+				t.Errorf("Invalid value found in array, expected to find: %s", val)
+			}
+		}
+	}
+}
+
+func TestArrayPopFunction(t *testing.T) {
+	expectedResults := [][]interface{}{
+		{1, 2},
+		{2, 4},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let arr = [1,2,3]; pop(arr); arr`, expectedResults[0]},
+		{`let arr = [2,4,6]; pop(arr); arr`, expectedResults[1]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		arr, isArray := evaluated.(*object.Array)
+
+		if !isArray {
+			t.Errorf("Expected an Array returned, got %T instead", arr.Type())
+		}
+
+		for _, val := range tt.expected {
+			if !contains(arr.Elements, val) {
+				t.Errorf("Invalid value found in array, expected to find: %s", val)
+			}
+		}
+	}
+}
+
+func TestArrayPopFunctionReturn(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`let arr = [1,2,3]; pop(arr);`, 3},
+		{`let arr = [2,4,6]; pop(arr);`, 6},
+		{`let arr = ["Frodo", "Baggins"]; pop(arr);`, "Baggins"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, isInt := evaluated.(*object.Integer)
+		expectedInt, expectedIsInt := tt.expected.(int)
+
+		if isInt && expectedIsInt {
+			testIntegerObject(t, integer, int64(expectedInt))
+		}
+
+		stringObj, isString := evaluated.(*object.String)
+
+		expectedString, expectedIsString := tt.expected.(string)
+
+		if isString && expectedIsString {
+			if expectedString != stringObj.Value {
+				t.Errorf("Invalid string value returned from Array#pop, expected to find: %s, got: %s instead", tt.expected, stringObj.Value)
+			}
+		}
+	}
+}
+
+func TestArrayShiftFunction(t *testing.T) {
+	expectedResults := [][]interface{}{
+		{2, 3},
+		{4, 6},
+	}
+	tests := []struct {
+		input    string
+		expected []interface{}
+	}{
+		{`let arr = [1,2,3]; shift(arr); arr`, expectedResults[0]},
+		{`let arr = [2,4,6]; shift(arr); arr`, expectedResults[1]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		arr, isArray := evaluated.(*object.Array)
+
+		if !isArray {
+			t.Errorf("Expected an Array returned, got %T instead", arr.Type())
+		}
+
+		for _, val := range tt.expected {
+			if !contains(arr.Elements, val) {
+				t.Errorf("Invalid value found in array, expected to find: %s", val)
+			}
+		}
+	}
+}
+
+func TestArrayShiftFunctionReturn(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{`let arr = [1,2,3]; shift(arr);`, 1},
+		{`let arr = [2,4,6]; shift(arr);`, 2},
+		{`let arr = ["Frodo", "Baggins"]; shift(arr);`, "Frodo"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, isInt := evaluated.(*object.Integer)
+		expectedInt, expectedIsInt := tt.expected.(int)
+
+		if isInt && expectedIsInt {
+			testIntegerObject(t, integer, int64(expectedInt))
+		}
+
+		stringObj, isString := evaluated.(*object.String)
+
+		expectedString, expectedIsString := tt.expected.(string)
+
+		if isString && expectedIsString {
+			if expectedString != stringObj.Value {
+				t.Errorf("Invalid string value returned from Array#pop, expected to find: %s, got: %s instead", tt.expected, stringObj.Value)
+			}
+		}
+	}
+}
+
+func TestArraySliceFunction(t *testing.T) {
+	expectedResults := [][]string{
+		{"camel", "duck", "elephant"},
+		{"camel", "duck"},
+		{"bison", "camel", "duck", "elephant"},
+		{"ant", "bison", "camel", "duck", "elephant"},
+	}
+	tests := []struct {
+		input    string
+		expected []string
+	}{
+		{`let animals = ["ant", "bison", "camel", "duck", "elephant"]; slice(animals, 2);`, expectedResults[0]},
+		{`let animals = ["ant", "bison", "camel", "duck", "elephant"]; slice(animals, 2, 4);`, expectedResults[1]},
+		{`let animals = ["ant", "bison", "camel", "duck", "elephant"]; slice(animals, 1, 5);`, expectedResults[2]},
+		{`let animals = ["ant", "bison", "camel", "duck", "elephant"]; slice(animals);`, expectedResults[3]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		arr, isArray := evaluated.(*object.Array)
+
+		if !isArray {
+			t.Errorf("Expected an Array returned, got %T instead", arr.Type())
+		}
+
+		for _, val := range tt.expected {
+			if !contains(arr.Elements, val) {
+				t.Errorf("Invalid value found in array, expected to find: %s", val)
+			}
 		}
 	}
 }

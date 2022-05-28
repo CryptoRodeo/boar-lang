@@ -2,6 +2,14 @@
 > "[Reject humanity, return to monke](https://knowyourmeme.com/memes/return-to-monke)" 🐒
 
 Go-based language interpreter for a toy programming language called "monke" (pronounced "monk")
+
+Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbook.com/) with some extra improvements, such as:
+- Additional built in functions for the Hash and Array objects (inspired from other languages such as Ruby)
+- Index reassignment for Arrays and Hashes
+- Base project refactors
+- Additional dev notes for each interpreter component
+- Other features that are currently a WIP
+
 ## Quick Start Guide:
 
 The recommended way is to use Docker:
@@ -14,17 +22,16 @@ docker build . -t monke-lang
 
 docker run -it monke-lang --name="monke-lang"
 
-Hello monke, feel free to type in commands
+Hello monke, (use Ctrl+C to exit)
 ~> 
 
-# To exit use Ctrl-C
 ```
 
 You can also just run it regularly (requires go version >= 1.16):
 ```
 go run .
 
-Hello kilgore, feel free to type in commands
+Hello kilgore, (use Ctrl+C to exit)
 ~> 
 ```
 
@@ -110,46 +117,108 @@ Hello World
 
 **Arrays:**
 ```
+::Creating an array
 ~> let x = [1,2,3]
 ~> x
 [1, 2, 3]
+
+::Adding to the array
 ~> let y = push(x,4)
 ~> y
 [1, 2, 3, 4]
+
+::Array#len
 ~> len(y)
 4
 ~> len(x)
 3
+
+::Array#first
 ~> first(x)
 1
+
+::Array#last
 ~> last(y)
 4
+
+::Array#[]
 ~> x[2]
 3
+
+::Array index assignment
+~> x[2] = "Hello!"
+Hello!
+~> x
+[1, 2, Hello!]
+
+::Array#map
+~> let arr = [1,2,3]
+~> let addTwo = fn(x) { x + 2; }
+~> let res = map(arr, addTwo)
+~> res
+[3, 4, 5]
+
+::Array#pop
+~> let arr = [1,2,3]
+~> let popVal = pop(arr)
+~> arr
+[1, 2]
+~> popVal
+3
+
+::Array#shift
+~> let tb = ["Tom", "Bombadil"]
+~> let firstName = shift(tb)
+~> firstName
+Tom
+~> tb
+[Bombadil]
+
+::Array#slice
+~> let animals = ["ant", "bison", "camel", "duck", "elephant"];
+~> slice(animals, 2)
+[camel, duck, elephant]
+~> slice(animals, 2, 4)
+[camel, duck]
+~> slice(animals)
+[ant, bison, camel, duck, elephant]
 ```
 
 **Hash Maps:**
 ```
+::Creating a hash
 ~> let person = { "name": "John", "age": (2*15) }
 ~> person
 {age: 30, name: John}
+
+::Hash#[]
 ~> person["name"]
 John
 ~> person["age"]
 30
+
+::Hash Index/Key assignment
 ~> let USDrinkingAge = 21
 ~> person["age"] = USDrinkingAge
 21
 ~> person["age"]
 21
+
+::Hash#valuesAt
 ~> valuesAt(person, "age", "name")
 [21, John]
+
+::Hash#toArray
 ~> toArray(person)
 [name, John, age, 21]
+
+::Hash#delete
 ~> delete(person, "age")
 {name: John, null: null}
 ~> person["age"]
 null
+
+::Hash#dig
 ~> let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } };
 ~> dig(person, "clothes", "shoes")
 yellow boots

@@ -340,11 +340,6 @@ func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object
 		return val
 	}
 
-	// check if its a built in function when the value is not in the current env / scope
-	if builtin, ok := builtins[node.Value]; ok {
-		return builtin
-	}
-
 	return newError("identifier not found: " + node.Value)
 }
 
@@ -369,6 +364,11 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 
 	// check if its a regular function
 	case *object.Function:
+		arr, isArray := args[0].(*object.Array)
+		// Possibly a #map call
+		if isArray && len(args) == 1 {
+			return applyMapCall(arr, fn)
+		}
 		// create the inner function scope
 		extendedEnv := extendFunctionEnv(fn, args)
 		//evalute the function body with the inner scope
@@ -384,6 +384,20 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 	default:
 		return newError("not a function: %s", fn.Type())
 	}
+}
+
+func applyMapCall(arr *object.Array, fn *object.Function) object.Object {
+	res := &object.Array{}
+	for _, val := range arr.Elements {
+		args := []object.Object{val}
+		// create an inner function scope for each function call
+		extendedEnv := extendFunctionEnv(fn, args)
+		// Evaluate
+		evaluated := Eval(fn.Body, extendedEnv)
+		// Add result to the array
+		res.Elements = append(res.Elements, unwrapReturnValue(evaluated))
+	}
+	return res
 }
 
 func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Environment {
@@ -495,9 +509,22 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 	return pair.Value
 }
 
-func evalIndexAssignment(hash, index, value object.Object) object.Object {
-	indexable := hash.(*object.Hash)
+func evalIndexAssignment(indexable, index, value object.Object) object.Object {
+	hash, isHash := indexable.(*object.Hash)
+	array, isArray := indexable.(*object.Array)
 
+	if isHash {
+		return evalHashKeyAssignment(hash, index, value)
+	}
+
+	if isArray {
+		return evalArrayIndexAssignment(array, index, value)
+	}
+
+	return newError("Invalid type passed, expected a type of Hash or Array, got %T instead", indexable.Type())
+}
+
+func evalHashKeyAssignment(hash *object.Hash, index, value object.Object) object.Object {
 	key, ok := index.(object.Hashable)
 
 	if !ok {
@@ -506,7 +533,19 @@ func evalIndexAssignment(hash, index, value object.Object) object.Object {
 
 	hashed_key := key.HashKey()
 
-	indexable.Pairs[hashed_key] = object.HashPair{Key: index, Value: value}
+	hash.Pairs[hashed_key] = object.HashPair{Key: index, Value: value}
+
+	return value
+}
+
+func evalArrayIndexAssignment(array *object.Array, index, value object.Object) object.Object {
+	idx, ok := index.(*object.Integer)
+
+	if !ok {
+		return newError("Invalid index value passed, expected an integer, got: %T", index.Type())
+	}
+
+	array.Elements[idx.Value] = value
 
 	return value
 }
