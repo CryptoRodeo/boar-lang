@@ -951,3 +951,36 @@ func TestArraySliceFunction(t *testing.T) {
 		}
 	}
 }
+
+func TestArrayInternalFunctionCall(t *testing.T) {
+	expectedResults := [][]string{
+		{"camel", "duck", "elephant"},
+		{"camel", "duck"},
+		{"bison", "camel", "duck", "elephant"},
+		{"ant", "bison", "camel", "duck", "elephant"},
+	}
+	tests := []struct {
+		input    string
+		expected []string
+	}{
+		{`let animals = ["ant", "bison", "camel", "duck", "elephant"]; animals.slice(2);`, expectedResults[0]},
+		{`let animals = ["ant", "bison", "camel", "duck", "elephant"]; animals.slice(2, 4);`, expectedResults[1]},
+		{`let animals = ["ant", "bison", "camel", "duck", "elephant"]; animals.slice(1, 5);`, expectedResults[2]},
+		{`let animals = ["ant", "bison", "camel", "duck", "elephant"]; animals.slice();`, expectedResults[3]},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		arr, isArray := evaluated.(*object.Array)
+
+		if !isArray {
+			t.Errorf("Expected an Array returned, got %T instead", arr.Type())
+		}
+
+		for _, val := range tt.expected {
+			if !contains(arr.Elements, val) {
+				t.Errorf("Invalid value found in array, expected to find: %s", val)
+			}
+		}
+	}
+}
