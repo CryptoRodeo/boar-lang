@@ -420,7 +420,6 @@ func (hl *HashLiteral) String() string {
 type InternalFunctionCall struct {
 	Token              token.Token  // the '.' token
 	CallerIdentifier   *Identifier  //someArray, someHash, etc
-	CallerType         string       // Array, Hash
 	FunctionIdentifier *Identifier  // pop, delete, etc.
 	Arguments          []Expression //(1,2,3), (), etc.
 }
