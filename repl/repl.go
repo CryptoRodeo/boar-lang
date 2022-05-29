@@ -8,11 +8,10 @@ import (
 	"monkey/lexer"
 	"monkey/object"
 	"monkey/parser"
+	"monkey/setuphelpers"
 )
 
 const PROMPT = "~> "
-
-const MONKE = `🙈`
 
 const TERMINATOR = "exit()"
 
@@ -21,15 +20,9 @@ const TERMINATOR = "exit()"
 func setup(in io.Reader, out io.Writer) (*bufio.Scanner, *object.Environment) {
 	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
-	LoadBuiltInMethods(env)
+	setuphelpers.LoadBuiltInMethods(env)
 
 	return scanner, env
-}
-
-func LoadBuiltInMethods(env *object.Environment) {
-	for key, value := range evaluator.BUILTIN {
-		env.Set(key, value)
-	}
 }
 
 func Start(in io.Reader, out io.Writer) {
@@ -59,7 +52,7 @@ func Start(in io.Reader, out io.Writer) {
 		program := p.ParseProgram()
 
 		if len(p.Errors()) != 0 {
-			PrintParserErrors(out, p.Errors())
+			setuphelpers.PrintParserErrors(out, p.Errors())
 			continue
 		}
 
@@ -72,12 +65,5 @@ func Start(in io.Reader, out io.Writer) {
 			io.WriteString(out, "\n")
 		}
 
-	}
-}
-
-func PrintParserErrors(out io.Writer, errors []string) {
-	io.WriteString(out, "\n"+MONKE+" Error!:\n")
-	for _, msg := range errors {
-		io.WriteString(out, "> "+msg+"\n\n")
 	}
 }
