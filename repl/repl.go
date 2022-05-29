@@ -8,12 +8,11 @@ import (
 	"monkey/lexer"
 	"monkey/object"
 	"monkey/parser"
-	"os/user"
 )
 
 const PROMPT = "~> "
 
-const BEAR = `ʕ•ᴥ•ʔ`
+const MONKE = `🙈`
 
 const TERMINATOR = "exit()"
 
@@ -35,7 +34,6 @@ func loadBuiltInMethods(env *object.Environment) {
 
 func Start(in io.Reader, out io.Writer) {
 	scanner, env := setup(in, out)
-
 	// Loop forever, until we exit
 	for {
 		fmt.Printf("%s", PROMPT)
@@ -68,7 +66,9 @@ func Start(in io.Reader, out io.Writer) {
 		//print the currently evaluated program
 		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
-			io.WriteString(out, evaluated.Inspect())
+			// apply syntax highlighting
+			str := ApplyColorToText(evaluated.Inspect())
+			io.WriteString(out, str)
 			io.WriteString(out, "\n")
 		}
 
@@ -76,16 +76,8 @@ func Start(in io.Reader, out io.Writer) {
 }
 
 func printParserErrors(out io.Writer, errors []string) {
-	user, err := user.Current()
-
-	if err != nil {
-		panic(err)
-	}
-
-	io.WriteString(out, "\n"+BEAR+"\n")
-	io.WriteString(out, "psst, hey "+user.Username+", I think you broke something...\n")
-	io.WriteString(out, "Errors found:\n")
+	io.WriteString(out, "\n"+MONKE+" Error!:\n")
 	for _, msg := range errors {
-		io.WriteString(out, "\t"+msg+"\n")
+		io.WriteString(out, "> "+msg+"\n\n")
 	}
 }

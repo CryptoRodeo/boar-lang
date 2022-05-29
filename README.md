@@ -9,6 +9,7 @@ Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbo
 - Index reassignment for Arrays and Hashes
 - Base project refactors
 - Additional dev notes for each interpreter component
+- Improved interpreter prompt (syntax highlighting, improved exiting)
 - Other features that are currently a WIP
 
 ## Quick Start Guide:
@@ -23,7 +24,7 @@ docker build . -t monke-lang
 
 docker run -it monke-lang --name="monke-lang"
 
-Hello monke, (use Ctrl+C to exit)
+Hello monke, use (Ctrl+C or type 'exit()' to exit)
 ~> 
 
 ```
@@ -31,9 +32,9 @@ Hello monke, (use Ctrl+C to exit)
 You can also just run it regularly (requires go version >= 1.16):
 ```
 go run .
-
-Hello kilgore, (use Ctrl+C to exit)
+Hello kilgore, use (Ctrl+C or type 'exit()' to exit)
 ~> 
+
 ```
 
 ## Language Features:
@@ -83,6 +84,21 @@ hello
 ```
 ~> "Hello" + " " + "World"
 Hello World
+```
+
+**Error handling:**
+```
+~> let x
+
+🙈 Error!:
+> expected next token to be =, got EOF instead
+
+~> let arr = [1,2 
+
+🙈 Error!:
+> expected next token to be ], got EOF instead
+
+~> 
 ```
 
 **functions:**
