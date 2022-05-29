@@ -30,6 +30,7 @@ const (
 	COMMA     = ","
 	SEMICOLON = ";"
 	COLON     = ":"
+	DOT       = "."
 
 	//parenthesis + brackets
 	LPAREN   = "("

@@ -152,6 +152,33 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
 
+	case *ast.InternalFunctionCall:
+		// someArr, someHash
+		caller_ident := Eval(node.CallerIdentifier, env)
+
+		if isError(caller_ident) {
+			return caller_ident
+		}
+		// .pop(), .delete(), etc
+		func_ident := Eval(node.FunctionIdentifier, env)
+
+		if isError(func_ident) {
+			return caller_ident
+		}
+		// (1,2,3), ("a", "b", "c"), etc
+		args := evalExpressions(node.Arguments, env)
+
+		for _, arg := range args {
+			if isError(arg) {
+				return nil
+			}
+		}
+		//  ( someArr, (1,2,3) )
+		newArgs := append([]object.Object{caller_ident}, args...)
+
+		// call the function as usual builtInFunc(objectIdentifier, args)
+		return applyFunction(func_ident, newArgs)
+
 	}
 
 	return nil
