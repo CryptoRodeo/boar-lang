@@ -78,6 +78,6 @@ func Start(in io.Reader, out io.Writer) {
 func printParserErrors(out io.Writer, errors []string) {
 	io.WriteString(out, "\n"+MONKE+" Error!:\n")
 	for _, msg := range errors {
-		io.WriteString(out, "> "+msg+"\n")
+		io.WriteString(out, "> "+msg+"\n\n")
 	}
 }
