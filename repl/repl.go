@@ -15,6 +15,8 @@ const PROMPT = "~> "
 
 const BEAR = `ʕ•ᴥ•ʔ`
 
+const TERMINATOR = "exit()"
+
 // Creates a new scanner, object environment and preloads
 // built in functions into the global environment
 func setup(in io.Reader, out io.Writer) (*bufio.Scanner, *object.Environment) {
@@ -45,6 +47,12 @@ func Start(in io.Reader, out io.Writer) {
 		}
 		// Grab the line we just read
 		line := scanner.Text()
+
+		// Exit
+		if line == TERMINATOR {
+			break
+		}
+
 		// pass it through the lexer
 		l := lexer.New(line)
 		// pass lexer generated tokens to the parser
