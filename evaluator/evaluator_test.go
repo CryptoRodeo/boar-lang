@@ -616,8 +616,11 @@ func TestHashKeyDeletions(t *testing.T) {
 		expected interface{}
 	}{
 		{`let hash = {"a": 2 }; delete(hash, "a"); hash["a"]`, nil},
+		{`let hash = {"a": 2 }; hash.delete("a"); hash["a"]`, nil},
 		{`let hash = {"a": 2, "b": 3 }; delete(hash, "b"); hash["b"]`, nil},
+		{`let hash = {"a": 2, "b": 3 }; hash.delete("b"); hash["b"]`, nil},
 		{`let hash = {"a": 2, "b":3, "c": 4 }; delete(hash, "a", "b"); hash["c"]`, 4},
+		{`let hash = {"a": 2, "b":3, "c": 4 }; hash.delete("a", "b"); hash["c"]`, 4},
 	}
 
 	for _, tt := range tests {
@@ -644,9 +647,13 @@ func TestHashValueRetrieval(t *testing.T) {
 		expected []interface{}
 	}{
 		{`let hash = {"a": 2 }; valuesAt(hash, "a");`, expected_results[0]},
+		{`let hash = {"a": 2 }; hash.valuesAt("a");`, expected_results[0]},
 		{`let hash = {"a": 2, "b": 3 };  valuesAt(hash, "a", "b")`, expected_results[1]},
+		{`let hash = {"a": 2, "b": 3 };  hash.valuesAt("a", "b")`, expected_results[1]},
 		{`let hash = {"a": 2, "b": 3 }; delete(hash, "b"); valuesAt(hash,"a","b") `, expected_results[2]},
+		{`let hash = {"a": 2, "b": 3 }; hash.delete("b"); hash.valuesAt("a","b") `, expected_results[2]},
 		{`let hash = {"a": 2, "b":3, "c": 4 }; delete(hash, "a", "b", "x"); valuesAt(hash, "a","b","c")`, expected_results[3]},
+		{`let hash = {"a": 2, "b":3, "c": 4 }; hash.delete("a", "b", "x"); hash.valuesAt("a","b","c")`, expected_results[3]},
 	}
 
 	for _, tt := range tests {
@@ -705,7 +712,9 @@ func TestHashToArrayConversion(t *testing.T) {
 		expected []interface{}
 	}{
 		{`let hash = {"a": 2 }; toArray(hash)`, expected_results[0]},
+		{`let hash = {"a": 2 }; hash.toArray()`, expected_results[0]},
 		{`let hash = {"a": 2, "b": 3 };  toArray(hash)`, expected_results[1]},
+		{`let hash = {"a": 2, "b": 3 };  hash.toArray()`, expected_results[1]},
 	}
 
 	for _, tt := range tests {
@@ -723,6 +732,7 @@ func TestHashDigging(t *testing.T) {
 		expected string
 	}{
 		{`let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } }; dig(person, "clothes", "shoes");`, expected_results[0]},
+		{`let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } }; person.dig("clothes", "shoes");`, expected_results[0]},
 	}
 
 	for _, tt := range tests {
@@ -780,7 +790,9 @@ func TestArrayMapFunction(t *testing.T) {
 		expected []interface{}
 	}{
 		{`let arr = [1,2,3]; let addTwo = fn(x) { x + 2; }; let arr = map(arr, addTwo); arr`, expectedResults[0]},
+		{`let arr = [1,2,3]; let addTwo = fn(x) { x + 2; }; let arr = arr.map(addTwo); arr`, expectedResults[0]},
 		{`let arr = [2,4,6]; let multiplyTwo = fn(x) { x * 2; }; let arr = map(arr, multiplyTwo); arr`, expectedResults[1]},
+		{`let arr = [2,4,6]; let multiplyTwo = fn(x) { x * 2; }; let arr = arr.map(multiplyTwo); arr`, expectedResults[1]},
 	}
 
 	for _, tt := range tests {
@@ -809,7 +821,9 @@ func TestArrayPopFunction(t *testing.T) {
 		expected []interface{}
 	}{
 		{`let arr = [1,2,3]; pop(arr); arr`, expectedResults[0]},
+		{`let arr = [1,2,3]; arr.pop(); arr`, expectedResults[0]},
 		{`let arr = [2,4,6]; pop(arr); arr`, expectedResults[1]},
+		{`let arr = [2,4,6]; arr.pop(); arr`, expectedResults[1]},
 	}
 
 	for _, tt := range tests {
@@ -834,8 +848,11 @@ func TestArrayPopFunctionReturn(t *testing.T) {
 		expected interface{}
 	}{
 		{`let arr = [1,2,3]; pop(arr);`, 3},
+		{`let arr = [1,2,3]; arr.pop();`, 3},
 		{`let arr = [2,4,6]; pop(arr);`, 6},
+		{`let arr = [2,4,6]; arr.pop();`, 6},
 		{`let arr = ["Frodo", "Baggins"]; pop(arr);`, "Baggins"},
+		{`let arr = ["Frodo", "Baggins"]; arr.pop();`, "Baggins"},
 	}
 
 	for _, tt := range tests {
@@ -869,7 +886,9 @@ func TestArrayShiftFunction(t *testing.T) {
 		expected []interface{}
 	}{
 		{`let arr = [1,2,3]; shift(arr); arr`, expectedResults[0]},
+		{`let arr = [1,2,3]; arr.shift(); arr`, expectedResults[0]},
 		{`let arr = [2,4,6]; shift(arr); arr`, expectedResults[1]},
+		{`let arr = [2,4,6]; arr.shift(); arr`, expectedResults[1]},
 	}
 
 	for _, tt := range tests {
@@ -894,8 +913,11 @@ func TestArrayShiftFunctionReturn(t *testing.T) {
 		expected interface{}
 	}{
 		{`let arr = [1,2,3]; shift(arr);`, 1},
+		{`let arr = [1,2,3]; arr.shift();`, 1},
 		{`let arr = [2,4,6]; shift(arr);`, 2},
+		{`let arr = [2,4,6]; arr.shift();`, 2},
 		{`let arr = ["Frodo", "Baggins"]; shift(arr);`, "Frodo"},
+		{`let arr = ["Frodo", "Baggins"]; arr.shift();`, "Frodo"},
 	}
 
 	for _, tt := range tests {
