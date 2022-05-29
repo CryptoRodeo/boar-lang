@@ -117,14 +117,6 @@ func (rs *ReturnStatement) String() string {
 	return out.String()
 }
 
-func (es *ExpressionStatement) String() string {
-	if es.Expression != nil {
-		return es.Expression.String()
-	}
-
-	return ""
-}
-
 // A statement that consists of only one expression
 // ex: let x = 5;
 // the expression here being 5 (which generates a value)
@@ -135,6 +127,13 @@ type ExpressionStatement struct {
 
 func (es *ExpressionStatement) statementNode()       {}
 func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
+func (es *ExpressionStatement) String() string {
+	if es.Expression != nil {
+		return es.Expression.String()
+	}
+
+	return ""
+}
 
 type IntegerLiteral struct {
 	Token token.Token
@@ -443,4 +442,28 @@ func (ifc *InternalFunctionCall) String() string {
 	out.WriteString(")")
 
 	return out.String()
+}
+
+type AssignmentExpression struct {
+	Token token.Token // the = token
+	Name  *Identifier //identifier for the binding (ex: x in x = 5)
+	Value Expression  //expression that produces the value (the 5 in let x = 5)
+}
+
+func (as *AssignmentExpression) expressionNode()      {}
+func (as *AssignmentExpression) TokenLiteral() string { return as.Token.Literal }
+func (as *AssignmentExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(as.Name.String())
+	out.WriteString(as.TokenLiteral())
+
+	if as.Value != nil {
+		out.WriteString(as.Value.String())
+	}
+
+	out.WriteString(";")
+
+	return out.String()
+
 }

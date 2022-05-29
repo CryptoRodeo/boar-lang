@@ -6,6 +6,7 @@ Go-based language interpreter for a toy programming language called "monke" (pro
 Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbook.com/) with some extra improvements, such as:
 - Additional built in functions for the Hash and Array objects (inspired from other languages such as Ruby)
 - Standard Object#Function invocation: `someObject.someMethod()` as opposed to `someMethod(someObject)`
+- Variable reassignment (`let x = 3; x = "hello"` as opposed to `let x = 3; let x = "hello"`)
 - Index reassignment for Arrays and Hashes
 - Base project refactors
 - Additional dev notes for each interpreter component
@@ -75,7 +76,7 @@ false
 ~> x
 2
 
-~> let x = "hello"
+~> x = "hello"
 ~> x
 hello
 ```
