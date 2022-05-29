@@ -1,3 +1,79 @@
+- Merge pull request #12 from CryptoRodeo/variable-reassignment
+- update README.md
+- evaluate assignment expressions
+- add test to evaluate assignment expressions
+- - assign precedence value to ASSIGN token - register ASSIGN token prefix - register infix parse function for ASSIGN token
+- add test to parse assignment statements
+- add lexer test to tokenize assignment statements
+- fix minor blunder, add AssignmentExpression node
+- tidy up go.mod
+- update comment
+- remove unused struct value
+- Merge pull request #11 from CryptoRodeo/improve-prompt
+- update error handling format
+- update examples, add error handling examples
+- update Error message format
+- update README.md
+- remove history arr. Removing the history traversal idea from this PR.
+- move syntaxHighlighter to REPL package since thats where its used.
+- update README.md
+- update how hashes are printed
+- apply syntax highlighting in REPL
+- create helper module to highlight syntax in REPL
+- add color package to main file, colorize prompt text
+- add imported modules
+- update README
+- update start prompt message
+- add REPL loop terminator
+- Merge pull request #10 from CryptoRodeo/function-call-improvements
+- update README to use new built in function invocation sytax
+- add additional test scenarios for the new function call syntax
+- implement evaluating internal function calls
+- add test for array internal function call
+- WIP: Begin evaluating internal function calls
+- update example comments
+- - create a new INTERNAL_CALL precedence value, set to highest. - register an infix parsing function for the dot token - Create method for parsing interal function calls
+- create test for parsing internal function calls
+- alter InternalFunctinCall AST Node
+- WIP add InternalFunctionCall AST Node type
+- tokenize the '.' character
+- Move this to the delimeter category
+- create a test to tokenize the '.' char in the lexer
+- actually lets rename this to dot. no one says "array period slice()"
+- add '.' character to token const dictionary
+- Merge pull request #9 from CryptoRodeo/array-improvements
+- add Array#slice example to README.md
+- Implement Array#slice
+- remove inspect line
+- whoops, forgot to add this
+- add Array#shift to README.md
+- implement Array#shift
+- add tests for Array#shift
+- Give Credit Where Credit Is Due :)
+- update spacing in README
+- update README.md
+- working Array#pop built in method
+- update test for Array#pop
+- add test for Array#pop
+- more comments
+- add comments for setup function
+- update README.md
+- WIP: working map built in function!
+- WIP: remove built in method check.  add check in applyFunction for map calls
+- remove uneeded print statement
+- preload built in methods in the test environment as well
+- preload built in methods before starting repl to get around invalid cycle issue with built in methods.
+- remove redundant line in README.md
+- add test for map built in function
+- WIP - map built in function
+- update README wiith example of array index assignment
+- Update start prompt message
+- Evaluate array index assignments
+- create test to evaluate array index assignments
+- add todo comment for first array object improvement
+- Fix FuncName values for error formatter
+- fix README.md
+- update changelog
 - refactor slice creation in __dig__
 - Remove redundent structs, use new hash builtin method error checker
 - prepare hash builtin method error checker
