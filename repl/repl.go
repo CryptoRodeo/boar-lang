@@ -35,7 +35,6 @@ func loadBuiltInMethods(env *object.Environment) {
 
 func Start(in io.Reader, out io.Writer) {
 	scanner, env := setup(in, out)
-	history := []string{}
 	// Loop forever, until we exit
 	for {
 		fmt.Printf("%s", PROMPT)
@@ -47,7 +46,6 @@ func Start(in io.Reader, out io.Writer) {
 		}
 		// Grab the line we just read
 		line := scanner.Text()
-		history = append(history, line)
 
 		// Exit
 		if line == TERMINATOR {
