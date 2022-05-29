@@ -11,6 +11,7 @@ Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbo
 - Base project refactors
 - Additional dev notes for each interpreter component
 - Improved interpreter prompt (syntax highlighting, improved exiting)
+- The ability to read from `.mke` files (or trigger the REPL using `--prompt`)
 - Other features that are currently a WIP
 
 ## Quick Start Guide:
