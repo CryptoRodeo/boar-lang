@@ -179,6 +179,22 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		// call the function as usual builtInFunc(objectIdentifier, args)
 		return applyFunction(func_ident, newArgs)
 
+	case *ast.AssignmentExpression:
+		// x, y, someIdentifier
+		// lets make sure this value exists (either in this scope or any existing outer scopes)
+
+		_, exists := env.Get(node.Name.Value)
+		if !exists {
+			return newError(`Identifier "%s" not found`, node.Name.Value)
+		}
+
+		val := Eval(node.Value, env)
+
+		if isError(val) {
+			return val
+		}
+
+		env.Set(node.Name.Value, val)
 	}
 
 	return nil
