@@ -1068,3 +1068,65 @@ func TestParsingInternalFunctionCalls(t *testing.T) {
 	testIntegerLiteral(t, one, 1)
 	testIntegerLiteral(t, two, 2)
 }
+
+func TestAssignmentExpressions(t *testing.T) {
+	tests := []struct {
+		input         string
+		expectedValue interface{}
+	}{
+		{"let x = 5; x = 4; x;", 4},
+		{"let y = true; y = false; y;", false},
+		{"let foobar = y; foobar = x; foobar;", "x"},
+	}
+
+	for _, tt := range tests {
+		// create a new lexer and parser
+		l := lexer.New(tt.input)
+		p := New(l)
+
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 3 {
+			t.Fatalf("program.Statements does not contain 1 statement. got=%d", len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[1].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("Expected to get back an *ast.ExpressionStatement, got %T instead", stmt)
+
+		}
+
+		// ident = val
+		exp, ok := stmt.Expression.(*ast.AssignmentExpression)
+
+		if !ok {
+			t.Fatalf("Expected to get back an *ast.AssignmentExpression, got %T instead", exp)
+		}
+
+		integer, ok := exp.Value.(*ast.IntegerLiteral)
+		expectedInt, expectedIsInt := tt.expectedValue.(int)
+
+		if ok && expectedIsInt {
+			testIntegerLiteral(t, integer, int64(expectedInt))
+		}
+
+		boolean, ok := exp.Value.(*ast.Boolean)
+		expectedBoolean, expectedIsBool := tt.expectedValue.(bool)
+
+		if ok && expectedIsBool {
+			if boolean.Value != expectedBoolean {
+				t.Fatalf("Expected to get back %v, got %v instead", expectedBoolean, boolean)
+			}
+		}
+
+		str, ok := exp.Value.(*ast.StringLiteral)
+		expectedString, expectedIsString := tt.expectedValue.(string)
+
+		if ok && expectedIsString {
+			if expectedString != str.Value {
+				t.Fatalf("Expected to get back %s, got %s instead", expectedString, str)
+			}
+		}
+	}
+}
