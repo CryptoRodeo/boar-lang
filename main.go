@@ -5,6 +5,8 @@ import (
 	"monkey/repl"
 	"os"
 	"os/user"
+
+	"github.com/TwiN/go-color"
 )
 
 func main() {
@@ -14,6 +16,9 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Hello %s, (use Ctrl+C or type 'exit()' to exit)\n", user.Username)
+	ctrlC := color.Ize(color.Red, "Ctrl+C")
+	terminator := color.Ize(color.Red, "exit()")
+	userName := color.Ize(color.Cyan, user.Username)
+	fmt.Printf("Hello %s, use (%s or type '%s' to exit)\n", userName, ctrlC, terminator)
 	repl.Start(os.Stdin, os.Stdout)
 }
