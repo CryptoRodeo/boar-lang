@@ -1006,3 +1006,17 @@ func TestArrayInternalFunctionCall(t *testing.T) {
 		}
 	}
 }
+func TestAssignmentExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"let a = 5; a = 4; a;", 4},
+		{"let a = 5 * 5; a = 4 * 4; a;", 16},
+		{"let a = 5; let b = a; b = 300; b;", 300},
+	}
+
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.input), tt.expected)
+	}
+}
