@@ -21,12 +21,12 @@ const TERMINATOR = "exit()"
 func setup(in io.Reader, out io.Writer) (*bufio.Scanner, *object.Environment) {
 	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
-	loadBuiltInMethods(env)
+	LoadBuiltInMethods(env)
 
 	return scanner, env
 }
 
-func loadBuiltInMethods(env *object.Environment) {
+func LoadBuiltInMethods(env *object.Environment) {
 	for key, value := range evaluator.BUILTIN {
 		env.Set(key, value)
 	}
@@ -59,7 +59,7 @@ func Start(in io.Reader, out io.Writer) {
 		program := p.ParseProgram()
 
 		if len(p.Errors()) != 0 {
-			printParserErrors(out, p.Errors())
+			PrintParserErrors(out, p.Errors())
 			continue
 		}
 
@@ -75,7 +75,7 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
-func printParserErrors(out io.Writer, errors []string) {
+func PrintParserErrors(out io.Writer, errors []string) {
 	io.WriteString(out, "\n"+MONKE+" Error!:\n")
 	for _, msg := range errors {
 		io.WriteString(out, "> "+msg+"\n\n")
