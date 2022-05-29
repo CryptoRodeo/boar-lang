@@ -31,6 +31,7 @@ const (
 	SUM           // +
 	PRODUCT       // *
 	PREFIX        // -X or !X
+	ASSIGN        // =
 	CALL          // myFunction(x)
 	INDEX         //array[index]
 	INTERNAL_CALL // arr.pop, hash.delete, etc
@@ -55,6 +56,7 @@ var precedences = map[token.TokenType]int{
 	token.LPAREN:   CALL,
 	token.LBRACKET: INDEX,
 	token.DOT:      INTERNAL_CALL,
+	token.ASSIGN:   ASSIGN,
 }
 
 /**
@@ -135,6 +137,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 	p.registerInfix(token.DOT, p.parseInternalCallExpression)
+	p.registerInfix(token.ASSIGN, p.parseAssignmentExpression)
 
 	return p
 }
@@ -788,6 +791,40 @@ func (p *Parser) parseInternalCallExpression(left ast.Expression) ast.Expression
 		Arguments:          args,
 	}
 	return ifc
+}
+
+func (p *Parser) parseAssignmentExpression(left ast.Expression) ast.Expression {
+	// the current token should be '.'
+	if !p.curTokenIs(token.ASSIGN) {
+		return nil
+	}
+
+	assignment := &ast.AssignmentExpression{}
+
+	assign := p.curToken
+
+	assignment.Token = assign
+
+	// Grab the identifier: arr, hash, etc.
+	ident, ok := left.(*ast.Identifier)
+
+	if !ok {
+		return nil
+	}
+
+	assignment.Name = ident
+
+	// Now lets grab the expression after '='
+	p.nextToken()
+	assignment.Value = p.parseExpression(LOWEST)
+
+	// If we reach a semicolon (terminating the expression), move onto the next token.
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return assignment
+
 }
 
 /**
