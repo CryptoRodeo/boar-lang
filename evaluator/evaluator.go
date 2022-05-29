@@ -173,7 +173,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				return nil
 			}
 		}
-		//  ( someArr, (1,2,3) )
+		//  ( someArr/someHash, (1,2,3) )
 		newArgs := append([]object.Object{caller_ident}, args...)
 
 		// call the function as usual builtInFunc(objectIdentifier, args)
