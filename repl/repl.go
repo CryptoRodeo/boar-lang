@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"monkey/evaluator"
+	"monkey/helper"
 	"monkey/lexer"
 	"monkey/object"
 	"monkey/parser"
@@ -68,7 +69,9 @@ func Start(in io.Reader, out io.Writer) {
 		//print the currently evaluated program
 		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
-			io.WriteString(out, evaluated.Inspect())
+			// apply syntax highlighting
+			str := helper.ApplyColorToText(evaluated.Inspect())
+			io.WriteString(out, str)
 			io.WriteString(out, "\n")
 		}
 
