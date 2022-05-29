@@ -5,6 +5,7 @@ Go-based language interpreter for a toy programming language called "monke" (pro
 
 Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbook.com/) with some extra improvements, such as:
 - Additional built in functions for the Hash and Array objects (inspired from other languages such as Ruby)
+- Standard Object#Function invocation: `someObject.someMethod()` as opposed to `someMethod(someObject)`
 - Index reassignment for Arrays and Hashes
 - Base project refactors
 - Additional dev notes for each interpreter component
@@ -132,13 +133,16 @@ Hello World
 4
 ~> len(x)
 3
+::Array#len alternative
+~> y.len()
+4
 
 ::Array#first
-~> first(x)
+~> x.first()
 1
 
 ::Array#last
-~> last(y)
+~> y.last()
 4
 
 ::Array#[]
@@ -154,13 +158,13 @@ Hello!
 ::Array#map
 ~> let arr = [1,2,3]
 ~> let addTwo = fn(x) { x + 2; }
-~> let res = map(arr, addTwo)
+~> let res = arr.map(addTwo)
 ~> res
 [3, 4, 5]
 
 ::Array#pop
 ~> let arr = [1,2,3]
-~> let popVal = pop(arr)
+~> let popVal = arr.pop()
 ~> arr
 [1, 2]
 ~> popVal
@@ -168,7 +172,7 @@ Hello!
 
 ::Array#shift
 ~> let tb = ["Tom", "Bombadil"]
-~> let firstName = shift(tb)
+~> let firstName = tb.shift()
 ~> firstName
 Tom
 ~> tb
@@ -176,11 +180,11 @@ Tom
 
 ::Array#slice
 ~> let animals = ["ant", "bison", "camel", "duck", "elephant"];
-~> slice(animals, 2)
+~> animals.slice(2)
 [camel, duck, elephant]
-~> slice(animals, 2, 4)
+~> animals.slice(2, 4)
 [camel, duck]
-~> slice(animals)
+~> animals.slice()
 [ant, bison, camel, duck, elephant]
 ```
 
@@ -205,22 +209,22 @@ John
 21
 
 ::Hash#valuesAt
-~> valuesAt(person, "age", "name")
+~> person.valuesAt("age", "name")
 [21, John]
 
 ::Hash#toArray
-~> toArray(person)
+~> person.toArray()
 [name, John, age, 21]
 
 ::Hash#delete
-~> delete(person, "age")
+~> person.delete("age")
 {name: John, null: null}
 ~> person["age"]
 null
 
 ::Hash#dig
 ~> let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } };
-~> dig(person, "clothes", "shoes")
+~> person.dig("clothes", "shoes")
 yellow boots
 
 ```
