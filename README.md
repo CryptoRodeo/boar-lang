@@ -9,7 +9,7 @@ Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbo
 - Index reassignment for Arrays and Hashes
 - Base project refactors
 - Additional dev notes for each interpreter component
-- Improved interpreter prompt (syntax highlighting, traverse history (WIP))
+- Improved interpreter prompt (syntax highlighting, improved exiting)
 - Other features that are currently a WIP
 
 ## Quick Start Guide:
