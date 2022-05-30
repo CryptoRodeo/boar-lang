@@ -477,7 +477,7 @@ type ForLoopStatement struct {
 	LoopBody      *BlockStatement
 }
 
-func (fl *ForLoopStatement) expressionNode()      {}
+func (fl *ForLoopStatement) statementNode()       {}
 func (fl *ForLoopStatement) TokenLiteral() string { return fl.Token.Literal }
 func (fl *ForLoopStatement) String() string {
 	var out bytes.Buffer
