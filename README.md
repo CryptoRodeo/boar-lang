@@ -4,6 +4,7 @@
 Go-based language interpreter for a toy programming language called "monke" (pronounced "monk")
 
 Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbook.com/) with some extra improvements, such as:
+- The ability to read and evaluate `.mke` code files (or trigger the REPL using `--prompt`)
 - Additional built in functions for the Hash and Array objects (inspired from other languages such as Ruby)
 - Standard Object#Function invocation: `someObject.someMethod()` as opposed to `someMethod(someObject)`
 - Variable reassignment (`let x = 3; x = "hello"` as opposed to `let x = 3; let x = "hello"`)
@@ -23,18 +24,31 @@ cd ./monke-lang
 
 docker build . -t monke-lang
 
-docker run -it monke-lang --name="monke-lang"
+docker run -it --name="monke-lang" monke-lang
+
+# To start the prompt type './monke --prompt'
+$ ./monke --prompt
 
 Hello monke, use (Ctrl+C or type 'exit()' to exit)
 ~> 
+
+# running an .mke file (a test file exists)
+$ ./monke -f ./test.mke
 
 ```
 
 You can also just run it regularly (requires go version >= 1.16):
 ```
-go run .
+# Build executable
+go build -o monke
+
+# Running the prompt
+$ ./monke --prompt
 Hello kilgore, use (Ctrl+C or type 'exit()' to exit)
 ~> 
+
+# Running a .mke file (a test file exists)
+$ ./monke -f ./test.mke
 
 ```
 

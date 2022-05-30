@@ -14,7 +14,7 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -v -o /code ./
+RUN go build -v -o monke /code ./
 
 RUN useradd -m ${USER} --uid=${UID} && echo "${USER}:${PW}" | chpasswd
 
