@@ -1,3 +1,3 @@
-#!/bin/sh
+#!/bin/bash
 
-go run ./main.go
+bash
