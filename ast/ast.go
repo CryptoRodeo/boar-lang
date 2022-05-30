@@ -474,7 +474,7 @@ type ForLoopStatement struct {
 	CounterVar    *LetStatement //identifier for the binding (ex: x in x = 5)
 	LoopCondition Expression
 	CounterUpdate *AssignmentExpression //expression that produces the value (the 5 in let x = 5)
-	LoopBody      *BlockStatement
+	LoopBlock     *BlockStatement
 }
 
 func (fl *ForLoopStatement) statementNode()       {}
@@ -489,7 +489,7 @@ func (fl *ForLoopStatement) String() string {
 	out.WriteString(";")
 	out.WriteString(fl.CounterUpdate.String())
 	out.WriteString("{")
-	out.WriteString(fl.LoopBody.String())
+	out.WriteString(fl.LoopBlock.String())
 	out.WriteString("};")
 
 	return out.String()
