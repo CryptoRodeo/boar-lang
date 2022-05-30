@@ -24,18 +24,31 @@ cd ./monke-lang
 
 docker build . -t monke-lang
 
-docker run -it monke-lang --name="monke-lang"
+docker run -it --name="monke-lang" monke-lang
+
+# To start the prompt type './monke --prompt'
+$ ./monke --prompt
 
 Hello monke, use (Ctrl+C or type 'exit()' to exit)
 ~> 
+
+# running an .mke file (a test file exists)
+$ ./monke -f ./test.mke
 
 ```
 
 You can also just run it regularly (requires go version >= 1.16):
 ```
-go run .
+# Build executable
+go build -o monke
+
+# Running the prompt
+$ ./monke --prompt
 Hello kilgore, use (Ctrl+C or type 'exit()' to exit)
 ~> 
+
+# Running a .mke file (a test file exists)
+$ ./monke -f ./test.mke
 
 ```
 
