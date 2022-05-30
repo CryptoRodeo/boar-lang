@@ -188,6 +188,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+	case token.FOR:
+		return p.parseForLoopStatement()
 	default:
 		// by default we'll parse it as an expression: x, foobar, x + y, etc
 		return p.parseExpressionStatement()
@@ -825,6 +827,10 @@ func (p *Parser) parseAssignmentExpression(left ast.Expression) ast.Expression {
 
 	return assignment
 
+}
+
+func (p *Parser) parseForLoopStatement() *ast.ForLoopStatement {
+	return &ast.ForLoopStatement{}
 }
 
 /**
