@@ -60,7 +60,7 @@ func Start(in io.Reader, out io.Writer) {
 		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			// apply syntax highlighting
-			str := ApplyColorToText(evaluated.Inspect())
+			str := setuphelpers.ApplyColorToText(evaluated.Inspect())
 			io.WriteString(out, str)
 			io.WriteString(out, "\n")
 		}
