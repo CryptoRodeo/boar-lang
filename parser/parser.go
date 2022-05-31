@@ -515,7 +515,6 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	// Continue parsing the statement until we reach the end of the block or token.EOF
 	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
 		stmt := p.parseStatement()
-		fmt.Println(p.curToken)
 		if stmt != nil {
 			block.Statements = append(block.Statements, stmt)
 		}
@@ -730,9 +729,11 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 		if !p.peekTokenIs(token.COLON) {
 			return nil
 		}
-
+		// most past colon :
 		p.nextToken()
 
+		//value
+		p.nextToken()
 		// grab the value
 		value := p.parseExpression(LOWEST)
 		// create the pair
@@ -912,6 +913,7 @@ func (p *Parser) parseForLoopStatement() *ast.ForLoopStatement {
 	if !ok {
 		return nil
 	}
+
 	// =
 	p.nextToken()
 	updateCounter := p.parseAssignmentExpression(identifier)
@@ -938,20 +940,12 @@ func (p *Parser) parseForLoopStatement() *ast.ForLoopStatement {
 	body := p.parseBlockStatement()
 	loop.LoopBlock = body
 
-	// {
-	// for ( let x = 0; x < 10; x = x + 1 ) { puts x }
-	if !p.curTokenIs(token.RBRACE) {
-		return nil
-	}
-
 	// for ( let x = 0; x < 10; x = x + 1 ) { puts x };
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
-		return loop
 	}
 
 	// for ( let x = 0; x < 10; x = x + 1 ) { puts x }
-	p.nextToken()
 	return loop
 }
 
