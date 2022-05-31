@@ -1133,10 +1133,9 @@ func TestAssignmentExpressions(t *testing.T) {
 
 func TestForLoopStatements(t *testing.T) {
 	tests := []struct {
-		input         string
-		expectedValue interface{}
+		input string
 	}{
-		{"for( let x = 0; x < 10; x = x + 1) { puts x; };", 4},
+		{"for( let x = 0; x < 10; x = x + 1) { puts(x) };"},
 	}
 
 	for _, tt := range tests {
@@ -1151,10 +1150,25 @@ func TestForLoopStatements(t *testing.T) {
 			t.Fatalf("program.Statements does not contain 1 statement. got=%d", len(program.Statements))
 		}
 
-		// stmt, ok := program.Statements[1].(*ast.ExpressionStatement)
-		// if !ok {
-		// 	t.Fatalf("Expected to get back an *ast.ExpressionStatement, got %T instead", stmt)
+		stmt, ok := program.Statements[0].(*ast.ForLoopStatement)
 
-		// }
+		if !ok {
+			t.Fatalf("Expected to get back an *ast.ForLoopStatement, got %T instead", stmt)
+
+		}
+
+		cond, ok := stmt.LoopCondition.(*ast.InfixExpression)
+
+		if !ok {
+			t.Fatalf("Expected to get back an *ast.InfixExpression, got back %T instead", cond)
+		}
+
+		if cond.Left.String() != "x" && cond.Operator != "<" && cond.Right.String() != "10" {
+			t.Fatalf("Expected loop condition to be x < 10, got %s %s %s instead", cond.Left.String(), cond.Operator, cond.Right.String())
+		}
+
+		if stmt.CounterUpdate.String() != "x=(x + 1);" {
+			t.Fatalf("Expected counter update to x = x + 1, got %s instead", stmt.CounterUpdate.String())
+		}
 	}
 }
