@@ -1,7 +1,7 @@
 # monke-lang
 > "[Reject humanity, return to monke](https://knowyourmeme.com/memes/return-to-monke)" 🐒
 
-Go-based language interpreter for a toy programming language called "monke" (pronounced "monk")
+Go-based language interpreter for a toy programming language called "monke" (pronounced "monkey")
 
 Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbook.com/) with some extra improvements, such as:
 - The ability to read and evaluate `.mke` code files (or trigger the REPL using `--prompt`)
