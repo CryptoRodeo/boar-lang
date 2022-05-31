@@ -1130,3 +1130,31 @@ func TestAssignmentExpressions(t *testing.T) {
 		}
 	}
 }
+
+func TestForLoopStatements(t *testing.T) {
+	tests := []struct {
+		input         string
+		expectedValue interface{}
+	}{
+		{"for( let x = 0; x < 10; x = x + 1) { puts x; };", 4},
+	}
+
+	for _, tt := range tests {
+		// create a new lexer and parser
+		l := lexer.New(tt.input)
+		p := New(l)
+
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain 1 statement. got=%d", len(program.Statements))
+		}
+
+		// stmt, ok := program.Statements[1].(*ast.ExpressionStatement)
+		// if !ok {
+		// 	t.Fatalf("Expected to get back an *ast.ExpressionStatement, got %T instead", stmt)
+
+		// }
+	}
+}
