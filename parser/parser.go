@@ -590,31 +590,6 @@ func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	return exp
 }
 
-func (p *Parser) parseCallArguments() []ast.Expression {
-	args := []ast.Expression{}
-
-	// No arguments
-	if p.peekTokenIs(token.RPAREN) {
-		p.nextToken()
-		return args
-	}
-	// most past lparen
-	p.nextToken()
-	args = append(args, p.parseExpression(LOWEST))
-
-	for p.peekTokenIs(token.COMMA) {
-		p.nextToken()
-		p.nextToken()
-		args = append(args, p.parseExpression(LOWEST))
-	}
-	// At the end of the argument list we should see a right parenthesis / closing parenthesis
-	if !p.expectPeek(token.RPAREN) {
-		return nil
-	}
-
-	return args
-}
-
 func (p *Parser) parseStringLiteral() ast.Expression {
 	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
 }
@@ -926,13 +901,12 @@ func (p *Parser) parseForLoopStatement() *ast.ForLoopStatement {
 
 	loop.CounterUpdate = counterUpdate
 	// for ( let x = 0; x < 10; x = x + 1 )
-	if !p.peekTokenIs(token.RPAREN) {
+	if !p.expectPeek(token.RPAREN) {
 		return nil
 	}
 
 	// for ( let x = 0; x < 10; x = x + 1 ) {
-	p.nextToken()
-	if !p.peekTokenIs(token.LBRACE) {
+	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}
 
