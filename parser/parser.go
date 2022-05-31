@@ -515,6 +515,7 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	// Continue parsing the statement until we reach the end of the block or token.EOF
 	for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
 		stmt := p.parseStatement()
+		fmt.Println(p.curToken)
 		if stmt != nil {
 			block.Statements = append(block.Statements, stmt)
 		}
@@ -726,11 +727,12 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 		key := p.parseExpression(LOWEST)
 
 		// A key should be followed by a : (ex: "key":"value")
-		if !p.expectPeek(token.COLON) {
+		if !p.peekTokenIs(token.COLON) {
 			return nil
 		}
 
 		p.nextToken()
+
 		// grab the value
 		value := p.parseExpression(LOWEST)
 		// create the pair
@@ -796,7 +798,7 @@ func (p *Parser) parseInternalCallExpression(left ast.Expression) ast.Expression
 }
 
 func (p *Parser) parseAssignmentExpression(left ast.Expression) ast.Expression {
-	// the current token should be '.'
+	// the current token should be '='
 	if !p.curTokenIs(token.ASSIGN) {
 		return nil
 	}
@@ -830,7 +832,127 @@ func (p *Parser) parseAssignmentExpression(left ast.Expression) ast.Expression {
 }
 
 func (p *Parser) parseForLoopStatement() *ast.ForLoopStatement {
-	return &ast.ForLoopStatement{}
+	// the current token value here should be 'for'
+	if !p.curTokenIs(token.FOR) {
+		return nil
+	}
+
+	forToken := p.curToken
+
+	loop := &ast.ForLoopStatement{
+		Token: forToken,
+	}
+
+	// Lets make sure the next token is an LPAREN '('
+	p.nextToken()
+	if !p.curTokenIs(token.LPAREN) {
+		return nil
+	}
+
+	// Move onto the next token
+	// we should now be at the LET statement
+
+	// for ( let x = 0
+	p.nextToken()
+	counterVar := p.parseStatement()
+
+	letStatement, ok := counterVar.(*ast.LetStatement)
+
+	if !ok {
+		return nil
+	}
+
+	loop.CounterVar = letStatement
+
+	// for ( let x = 0 ;
+	if !p.curTokenIs(token.SEMICOLON) {
+		return nil
+	}
+
+	// x < 10
+	p.nextToken()
+	ident := p.parseIdentifier()
+
+	identifier, ok := ident.(*ast.Identifier)
+
+	if !ok {
+		return nil
+	}
+
+	p.nextToken()
+	loopCondition := p.parseInfixExpression(identifier)
+
+	condition, ok := loopCondition.(*ast.InfixExpression)
+
+	if !ok {
+		return nil
+	}
+
+	loop.LoopCondition = condition
+
+	// for ( let x = 0 ; x < 10 ;
+	if !p.peekTokenIs(token.SEMICOLON) {
+		return nil
+	}
+
+	p.nextToken()
+
+	// this should be pointing at 'x' now.
+	// x = x + 1
+	p.nextToken()
+
+	if !p.curTokenIs(token.IDENT) {
+		return nil
+	}
+
+	ident = p.parseIdentifier()
+
+	identifier, ok = ident.(*ast.Identifier)
+
+	if !ok {
+		return nil
+	}
+	// =
+	p.nextToken()
+	updateCounter := p.parseAssignmentExpression(identifier)
+	// lets make sure this is an assignment expression
+	counterUpdate, ok := updateCounter.(*ast.AssignmentExpression)
+
+	if !ok {
+		return nil
+	}
+
+	loop.CounterUpdate = counterUpdate
+	// for ( let x = 0; x < 10; x = x + 1 )
+	if !p.peekTokenIs(token.RPAREN) {
+		return nil
+	}
+
+	// for ( let x = 0; x < 10; x = x + 1 ) {
+	p.nextToken()
+	if !p.peekTokenIs(token.LBRACE) {
+		return nil
+	}
+
+	// for ( let x = 0; x < 10; x = x + 1 ) { puts x
+	body := p.parseBlockStatement()
+	loop.LoopBlock = body
+
+	// {
+	// for ( let x = 0; x < 10; x = x + 1 ) { puts x }
+	if !p.curTokenIs(token.RBRACE) {
+		return nil
+	}
+
+	// for ( let x = 0; x < 10; x = x + 1 ) { puts x };
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+		return loop
+	}
+
+	// for ( let x = 0; x < 10; x = x + 1 ) { puts x }
+	p.nextToken()
+	return loop
 }
 
 /**
