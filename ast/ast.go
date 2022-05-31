@@ -481,13 +481,13 @@ func (fl *ForLoopStatement) statementNode()       {}
 func (fl *ForLoopStatement) TokenLiteral() string { return fl.Token.Literal }
 func (fl *ForLoopStatement) String() string {
 	var out bytes.Buffer
-	out.WriteString(fl.Token.Literal)
+	out.WriteString(fl.TokenLiteral())
 	out.WriteString("(")
 	out.WriteString(fl.CounterVar.String())
-	out.WriteString(";")
 	out.WriteString(fl.LoopCondition.String())
 	out.WriteString(";")
 	out.WriteString(fl.CounterUpdate.String())
+	out.WriteString(")")
 	out.WriteString("{")
 	out.WriteString(fl.LoopBlock.String())
 	out.WriteString("};")
