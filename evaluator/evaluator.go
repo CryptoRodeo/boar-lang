@@ -195,6 +195,31 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		env.Set(node.Name.Value, val)
+
+	case *ast.ForLoopStatement:
+		// Lets set the counter var in the env
+		counterVar := Eval(node.CounterVar, env)
+
+		if isError(counterVar) {
+			return counterVar
+		}
+
+		// Now lets make sure it actually got set / exists
+		counterVar, exists := env.Get(node.CounterVar.Name.Value)
+
+		if !exists {
+			return counterVar
+		}
+
+		// Lets make sure we have a valid for loop condition
+		loopCondition := Eval(node.LoopCondition, env)
+
+		if isError(loopCondition) {
+			return loopCondition
+		}
+
+		// Now run the for loop.
+		return applyForLoop(node, env)
 	}
 
 	return nil
@@ -591,6 +616,35 @@ func evalArrayIndexAssignment(array *object.Array, index, value object.Object) o
 	array.Elements[idx.Value] = value
 
 	return value
+}
+
+func applyForLoop(forLoop *ast.ForLoopStatement, env *object.Environment) object.Object {
+	var result object.Object
+
+	//Evaluate the first loop condition
+	stopLoop := Eval(forLoop.LoopCondition, env)
+	loopCondition, ok := stopLoop.(*object.Boolean)
+
+	if !ok {
+		return newError("Invalid loop condition type: %T", loopCondition)
+	}
+
+	// While this loop condition is false
+	for loopCondition.Value {
+		result = Eval(forLoop.LoopBlock, env)
+
+		updateVal := Eval(forLoop.CounterUpdate.Value, env)
+
+		env.Set(forLoop.CounterVar.Name.Value, updateVal)
+
+		//Continue evaluating the loop condition in the loop
+		loopCondition := Eval(forLoop.LoopCondition, env).(*object.Boolean)
+
+		if !loopCondition.Value {
+			return result
+		}
+	}
+	return result
 }
 
 func isArray(o object.Object) bool {
