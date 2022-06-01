@@ -1035,7 +1035,7 @@ func TestForLoopStatement(t *testing.T) {
 		if tt.expected == nil {
 			nullObj, isNull := evaluated.(*object.Null)
 			if !isNull {
-				t.Errorf("Expected to get back a null value, got %T back instead", nullObj.Type())
+				t.Errorf("Expected to get back a null value, got %T back instead", nullObj)
 			}
 		}
 
