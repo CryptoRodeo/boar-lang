@@ -9,6 +9,9 @@ import (
 	"monkey/object"
 	"monkey/parser"
 	"monkey/setuphelpers"
+	"os/user"
+
+	"github.com/TwiN/go-color"
 )
 
 const PROMPT = "~> "
@@ -26,6 +29,7 @@ func setup(in io.Reader, out io.Writer) (*bufio.Scanner, *object.Environment) {
 }
 
 func Start(in io.Reader, out io.Writer) {
+	printInterpreterPrompt()
 	scanner, env := setup(in, out)
 	// Loop forever, until we exit
 	for {
@@ -66,4 +70,17 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 	}
+}
+
+func printInterpreterPrompt() {
+	user, err := user.Current()
+
+	if err != nil {
+		panic(err)
+	}
+
+	ctrlC := color.Ize(color.Red, "Ctrl+C")
+	terminator := color.Ize(color.Red, "exit()")
+	userName := color.Ize(color.Cyan, user.Username)
+	fmt.Printf("Hello %s, use (%s or type '%s' to exit)\n", userName, ctrlC, terminator)
 }
