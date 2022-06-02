@@ -1020,3 +1020,33 @@ func TestAssignmentExpressions(t *testing.T) {
 		testIntegerObject(t, testEval(tt.input), tt.expected)
 	}
 }
+
+func TestForLoopStatement(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{"for(let x = 0; x < 10; x = x + 1) { puts(x) };", nil},
+		{"let y = 0; for(let x = 0; x < 10; x = x + 1) { y = x; }; y;", 9},
+	}
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+
+		if tt.expected == nil {
+			nullObj, isNull := evaluated.(*object.Null)
+			if !isNull {
+				t.Errorf("Expected to get back a null value, got %T back instead", nullObj)
+			}
+		}
+
+		if intVal, ok := tt.expected.(int); ok {
+			intObj, isInt := evaluated.(*object.Integer)
+
+			if !isInt {
+				t.Errorf("Expected to get back an integer value, got %T back instead", intObj)
+			}
+			testIntegerObject(t, intObj, int64(intVal))
+		}
+
+	}
+}

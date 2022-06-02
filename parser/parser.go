@@ -188,6 +188,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+	case token.FOR:
+		return p.parseForLoopStatement()
 	default:
 		// by default we'll parse it as an expression: x, foobar, x + y, etc
 		return p.parseExpressionStatement()
@@ -588,31 +590,6 @@ func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	return exp
 }
 
-func (p *Parser) parseCallArguments() []ast.Expression {
-	args := []ast.Expression{}
-
-	// No arguments
-	if p.peekTokenIs(token.RPAREN) {
-		p.nextToken()
-		return args
-	}
-	// most past lparen
-	p.nextToken()
-	args = append(args, p.parseExpression(LOWEST))
-
-	for p.peekTokenIs(token.COMMA) {
-		p.nextToken()
-		p.nextToken()
-		args = append(args, p.parseExpression(LOWEST))
-	}
-	// At the end of the argument list we should see a right parenthesis / closing parenthesis
-	if !p.expectPeek(token.RPAREN) {
-		return nil
-	}
-
-	return args
-}
-
 func (p *Parser) parseStringLiteral() ast.Expression {
 	return &ast.StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
 }
@@ -724,10 +701,13 @@ func (p *Parser) parseHashLiteral() ast.Expression {
 		key := p.parseExpression(LOWEST)
 
 		// A key should be followed by a : (ex: "key":"value")
-		if !p.expectPeek(token.COLON) {
+		if !p.peekTokenIs(token.COLON) {
 			return nil
 		}
+		// most past colon :
+		p.nextToken()
 
+		//value
 		p.nextToken()
 		// grab the value
 		value := p.parseExpression(LOWEST)
@@ -794,7 +774,7 @@ func (p *Parser) parseInternalCallExpression(left ast.Expression) ast.Expression
 }
 
 func (p *Parser) parseAssignmentExpression(left ast.Expression) ast.Expression {
-	// the current token should be '.'
+	// the current token should be '='
 	if !p.curTokenIs(token.ASSIGN) {
 		return nil
 	}
@@ -825,6 +805,122 @@ func (p *Parser) parseAssignmentExpression(left ast.Expression) ast.Expression {
 
 	return assignment
 
+}
+
+func (p *Parser) parseForLoopStatement() *ast.ForLoopStatement {
+	// the current token value here should be 'for'
+	if !p.curTokenIs(token.FOR) {
+		return nil
+	}
+
+	forToken := p.curToken
+
+	loop := &ast.ForLoopStatement{
+		Token: forToken,
+	}
+
+	// Lets make sure the next token is an LPAREN '('
+	p.nextToken()
+	if !p.curTokenIs(token.LPAREN) {
+		return nil
+	}
+
+	// Move onto the next token
+	// we should now be at the LET statement
+
+	// for ( let x = 0
+	p.nextToken()
+	counterVar := p.parseStatement()
+
+	letStatement, ok := counterVar.(*ast.LetStatement)
+
+	if !ok {
+		return nil
+	}
+
+	loop.CounterVar = letStatement
+
+	// for ( let x = 0 ;
+	if !p.curTokenIs(token.SEMICOLON) {
+		return nil
+	}
+
+	// x < 10
+	p.nextToken()
+	ident := p.parseIdentifier()
+
+	identifier, ok := ident.(*ast.Identifier)
+
+	if !ok {
+		return nil
+	}
+
+	p.nextToken()
+	loopCondition := p.parseInfixExpression(identifier)
+
+	condition, ok := loopCondition.(*ast.InfixExpression)
+
+	if !ok {
+		return nil
+	}
+
+	loop.LoopCondition = condition
+
+	// for ( let x = 0 ; x < 10 ;
+	if !p.peekTokenIs(token.SEMICOLON) {
+		return nil
+	}
+
+	p.nextToken()
+
+	// this should be pointing at 'x' now.
+	// x = x + 1
+	p.nextToken()
+
+	if !p.curTokenIs(token.IDENT) {
+		return nil
+	}
+
+	ident = p.parseIdentifier()
+
+	identifier, ok = ident.(*ast.Identifier)
+
+	if !ok {
+		return nil
+	}
+
+	// =
+	p.nextToken()
+	updateCounter := p.parseAssignmentExpression(identifier)
+	// lets make sure this is an assignment expression
+	counterUpdate, ok := updateCounter.(*ast.AssignmentExpression)
+
+	if !ok {
+		return nil
+	}
+
+	loop.CounterUpdate = counterUpdate
+	// for ( let x = 0; x < 10; x = x + 1 )
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	// for ( let x = 0; x < 10; x = x + 1 ) {
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	// for ( let x = 0; x < 10; x = x + 1 ) { puts x
+	body := p.parseBlockStatement()
+	loop.LoopBlock = body
+
+	// for ( let x = 0; x < 10; x = x + 1 ) { puts x };
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	// for ( let x = 0; x < 10; x = x + 1 ) { puts x }
+	return loop
 }
 
 /**
