@@ -15,36 +15,50 @@ import (
 	"github.com/c-bata/go-prompt"
 )
 
+// Used to determine if we should swap out the cursor / prefix
+// i.e. when evaluating the next line
+var LivePrefixState struct {
+	LivePrefix string
+	IsEnabled  bool
+}
 var CURSOR = "~> "
-var CURSOR_OPTION = prompt.OptionPrefix(CURSOR)
 
 const TERMINATOR = "exit()"
 
+// Global obj.Environment. Holds builtin functions
 var ENV = setupEnv()
 
+// Holds all user input lines, used in case we need to evaluate user input
+// on the next line.
 var CODE_BUFFER = []string{}
-var charsStillOpen int = 0
-var PROMPT *prompt.Prompt = prompt.New(readInput, completer, CURSOR_OPTION)
+
+// used to determine if we should evaluate the next line
+var CHARS_STILL_OPEN int = 0
 
 func Start() {
 	printInterpreterPrompt()
-	PROMPT.Run()
+
+	cursor := prompt.OptionPrefix(CURSOR)
+	liveCursor := prompt.OptionLivePrefix(changeLivePrefix)
+
+	p := prompt.New(readInput, completer, cursor, liveCursor)
+	p.Run()
 }
 
 func shouldContinue(code string) bool {
 	for _, c := range code {
 		if c == '{' || c == '(' {
-			charsStillOpen++
+			CHARS_STILL_OPEN++
 		}
 
 		if c == '}' || c == ')' {
-			charsStillOpen--
+			CHARS_STILL_OPEN--
 		}
 	}
-	return charsStillOpen > 0
+	return CHARS_STILL_OPEN > 0
 }
 
-// Creates a new scanner, object environment and preloads
+// Creates a new object environment and preloads
 // built in functions into the global environment
 func setupEnv() *object.Environment {
 	env := object.NewEnvironment()
@@ -63,6 +77,8 @@ func completer(t prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{
 		{Text: "let", Description: "declare a statement"},
 		{Text: "puts", Description: "print a value"},
+		{Text: "fn", Description: "declare a function literal"},
+		{Text: "if", Description: "declare a conditional statement"},
 	}
 
 	return prompt.FilterHasPrefix(s, t.CurrentLine(), true)
@@ -75,10 +91,9 @@ func printInterpreterPrompt() {
 		panic(err)
 	}
 
-	ctrlC := color.Ize(color.Red, "Ctrl+C")
 	terminator := color.Ize(color.Red, "exit()")
 	userName := color.Ize(color.Cyan, user.Username)
-	fmt.Printf("Hello %s, use (%s or type '%s' to exit)\n", userName, ctrlC, terminator)
+	fmt.Printf("Hello %s, (type '%s' to exit)\n", userName, terminator)
 }
 
 func printParserErrors(errors []string) {
@@ -93,8 +108,13 @@ func evaluate(line string) {
 	CODE_BUFFER = append(CODE_BUFFER, line)
 
 	if shouldContinue(line) {
+		LivePrefixState.IsEnabled = true
+		LivePrefixState.LivePrefix = "  ... "
 		return
 	}
+
+	LivePrefixState.IsEnabled = false
+	LivePrefixState.LivePrefix = CURSOR
 
 	code := formatLine(CODE_BUFFER)
 	emptyCodeBuffer()
@@ -125,6 +145,10 @@ func emptyCodeBuffer() {
 
 func formatLine(lines []string) string {
 	return strings.Join(lines, " ")
+}
+
+func changeLivePrefix() (string, bool) {
+	return LivePrefixState.LivePrefix, LivePrefixState.IsEnabled
 }
 
 func exitRepl() {
