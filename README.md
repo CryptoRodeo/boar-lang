@@ -10,14 +10,13 @@ Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbo
 - Variable reassignment (`let x = 3; x = "hello"` as opposed to `let x = 3; let x = "hello"`)
 - Index reassignment for Arrays and Hashes (`hash[key] = expression`, `arr[index] = expression`)
 - For loops
-- Base project refactors
-- Additional dev notes for each interpreter component
 - Improved REPL: 
   - evaluate multiple lines
   - user input history
   - syntax highlighting
   - exit typing `exit()`
-- Other features that are currently a WIP
+- Base project refactors
+- Additional dev notes for each interpreter component
 
 ## Quick Start Guide:
 
