@@ -12,7 +12,11 @@ Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbo
 - For loops
 - Base project refactors
 - Additional dev notes for each interpreter component
-- Improved interpreter prompt (syntax highlighting, improved exiting)
+- Improved REPL: 
+  - evaluate multiple lines
+  - user input history
+  - syntax highlighting
+  - exit typing `exit()`
 - Other features that are currently a WIP
 
 ## Quick Start Guide:
@@ -29,8 +33,7 @@ docker run -it --name="monke-lang" monke-lang
 
 # To start the prompt type './monke --prompt'
 $ ./monke --prompt
-
-Hello monke, use (Ctrl+C or type 'exit()' to exit)
+Hello monke, (type 'exit()' to exit)
 ~> 
 
 # running an .mk file (a test file exists)
@@ -45,7 +48,8 @@ go build -o monke
 
 # Running the prompt
 $ ./monke --prompt
-Hello kilgore, use (Ctrl+C or type 'exit()' to exit)
+
+Hello kilgore, (type 'exit()' to exit)
 ~> 
 
 # Running a .mk file (a test file exists)
