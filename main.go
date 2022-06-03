@@ -17,7 +17,7 @@ func main() {
 
 	switch os.Args[1] {
 	case "--prompt":
-		repl.Start(os.Stdin, os.Stdout)
+		repl.Start()
 	case "-f":
 		file_eval.EvaluateFile(os.Stdin, os.Stdout, os.Args[2])
 	default:
