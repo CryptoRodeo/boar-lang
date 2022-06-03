@@ -6,20 +6,7 @@ import (
 	"monkey/file_eval"
 	"monkey/repl"
 	"os"
-
-	prompt "github.com/c-bata/go-prompt"
 )
-
-func executor(t string) {
-	if t == "exit()" {
-		fmt.Printf("Goodbye!")
-		os.Exit(0)
-	}
-}
-
-func completer(t prompt.Document) []prompt.Suggest {
-	return []prompt.Suggest{}
-}
 
 func main() {
 	// no arguments passed
