@@ -9,22 +9,39 @@ import (
 	"monkey/setuphelpers"
 	"os"
 	"os/user"
+	"strings"
 
 	"github.com/TwiN/go-color"
 	"github.com/c-bata/go-prompt"
 )
 
-const PROMPT = "~> "
+var CURSOR = "~> "
+var CURSOR_OPTION = prompt.OptionPrefix(CURSOR)
 
 const TERMINATOR = "exit()"
 
 var ENV = setupEnv()
 
+var CODE_BUFFER = []string{}
+var charsStillOpen int = 0
+var PROMPT *prompt.Prompt = prompt.New(readInput, completer, CURSOR_OPTION)
+
 func Start() {
 	printInterpreterPrompt()
-	setCursor := prompt.OptionPrefix(PROMPT)
-	p := prompt.New(readInput, completer, setCursor)
-	p.Run()
+	PROMPT.Run()
+}
+
+func shouldContinue(code string) bool {
+	for _, c := range code {
+		if c == '{' || c == '(' {
+			charsStillOpen++
+		}
+
+		if c == '}' || c == ')' {
+			charsStillOpen--
+		}
+	}
+	return charsStillOpen > 0
 }
 
 // Creates a new scanner, object environment and preloads
@@ -73,8 +90,16 @@ func printParserErrors(errors []string) {
 }
 
 func evaluate(line string) {
+	CODE_BUFFER = append(CODE_BUFFER, line)
+
+	if shouldContinue(line) {
+		return
+	}
+
+	code := formatLine(CODE_BUFFER)
+	emptyCodeBuffer()
 	// pass it through the lexer
-	l := lexer.New(line)
+	l := lexer.New(code)
 	// pass lexer generated tokens to the parser
 	p := parser.New(l)
 	// parse the program
@@ -92,6 +117,14 @@ func evaluate(line string) {
 		str := setuphelpers.ApplyColorToText(evaluated.Inspect())
 		fmt.Println(str)
 	}
+}
+
+func emptyCodeBuffer() {
+	CODE_BUFFER = make([]string, 0)
+}
+
+func formatLine(lines []string) string {
+	return strings.Join(lines, " ")
 }
 
 func exitRepl() {
