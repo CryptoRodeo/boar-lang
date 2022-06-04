@@ -3,6 +3,10 @@
 
 Go-based language interpreter for a toy programming language called "monke" (pronounced "monk-eh")
 
+## Short Demo
+![monke-demo-gif](./monke-demo.gif)
+
+## Details
 Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbook.com/) with some extra improvements, such as:
 - The ability to read and evaluate `.mk` code files (or trigger the REPL using `--prompt`)
 - Additional built in functions for the Hash and Array objects (inspired from other languages such as Ruby)
