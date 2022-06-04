@@ -45,16 +45,15 @@ func Start() {
 	p.Run()
 }
 
-func shouldContinue(code string) bool {
-	for _, c := range code {
-		if c == '{' || c == '(' {
-			CHARS_STILL_OPEN++
-		}
-
-		if c == '}' || c == ')' {
-			CHARS_STILL_OPEN--
-		}
+func shouldContinue(char rune) bool {
+	if char == '{' || char == '(' {
+		CHARS_STILL_OPEN++
 	}
+
+	if char == '}' || char == ')' {
+		CHARS_STILL_OPEN--
+	}
+
 	return CHARS_STILL_OPEN > 0
 }
 
@@ -79,6 +78,13 @@ func completer(t prompt.Document) []prompt.Suggest {
 		{Text: "puts", Description: "print a value"},
 		{Text: "fn", Description: "declare a function literal"},
 		{Text: "if", Description: "declare a conditional statement"},
+	}
+
+	// Check if we're evaluating the last block, reset cursor so indentation is correct.
+	finalChar := getFinalChar(t.CurrentLine())
+	if finalBlock(finalChar) {
+		resetCursor()
+		resetBlockCounter()
 	}
 
 	return prompt.FilterHasPrefix(s, t.CurrentLine(), true)
@@ -107,14 +113,12 @@ func printParserErrors(errors []string) {
 func evaluate(line string) {
 	CODE_BUFFER = append(CODE_BUFFER, line)
 
-	if shouldContinue(line) {
-		LivePrefixState.IsEnabled = true
-		LivePrefixState.LivePrefix = "  ... "
+	if shouldContinue(getFinalChar(line)) {
+		setBlockCursor()
 		return
 	}
 
-	LivePrefixState.IsEnabled = false
-	LivePrefixState.LivePrefix = CURSOR
+	resetCursor()
 
 	code := formatLine(CODE_BUFFER)
 	emptyCodeBuffer()
@@ -147,8 +151,38 @@ func formatLine(lines []string) string {
 	return strings.Join(lines, " ")
 }
 
+func getFinalChar(line string) rune {
+	if len(line) == 0 {
+		return 0
+	}
+	return rune(line[len(line)-1])
+
+}
+
 func changeLivePrefix() (string, bool) {
 	return LivePrefixState.LivePrefix, LivePrefixState.IsEnabled
+}
+
+func finalBlock(r rune) bool {
+	return r == '}' && CHARS_STILL_OPEN == 1
+}
+
+func resetCursor() {
+	LivePrefixState.IsEnabled = false
+	LivePrefixState.LivePrefix = CURSOR
+}
+
+func setBlockCursor() {
+	indentationLevel := ""
+	for i := 0; i < CHARS_STILL_OPEN; i++ {
+		indentationLevel += " "
+	}
+	LivePrefixState.IsEnabled = true
+	LivePrefixState.LivePrefix = (indentationLevel + "... ")
+}
+
+func resetBlockCounter() {
+	CHARS_STILL_OPEN = 0
 }
 
 func exitRepl() {
