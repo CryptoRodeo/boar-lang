@@ -21,7 +21,9 @@ var LivePrefixState struct {
 	LivePrefix string
 	IsEnabled  bool
 }
+
 var CURSOR = "~> "
+var BLOCK_CURSOR = "... "
 
 const TERMINATOR = "exit()"
 
@@ -178,7 +180,7 @@ func setBlockCursor() {
 		indentationLevel += " "
 	}
 	LivePrefixState.IsEnabled = true
-	LivePrefixState.LivePrefix = (indentationLevel + "... ")
+	LivePrefixState.LivePrefix = (indentationLevel + BLOCK_CURSOR)
 }
 
 func resetBlockCounter() {
