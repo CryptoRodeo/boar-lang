@@ -1,5 +1,5 @@
 # monke-lang
-> "[Reject humanity, return to monke](https://knowyourmeme.com/memes/return-to-monke)" 🐒
+> "[Reject humanity, return to monke](https://www.urbandictionary.com/define.php?term=Return+to+Monke)" 🐒
 
 Go-based language interpreter for a toy programming language called "monke" (pronounced "monk-eh")
 
