@@ -1,9 +1,9 @@
 # monke-lang
 > "[Reject humanity, return to monke](https://www.urbandictionary.com/define.php?term=Return+to+Monke)" 🐒
 
-![workflow](https://github.com/CryptoRodeo/monke-lang/actions/workflows/workflow.yml/badge.svg)
-
 Go-based language interpreter for a toy programming language called "monke" (pronounced "monk-eh")
+
+![workflow](https://github.com/CryptoRodeo/monke-lang/actions/workflows/workflow.yml/badge.svg)
 
 ## Short Demo
 ![monke-demo-gif](./monke-demo.gif)
