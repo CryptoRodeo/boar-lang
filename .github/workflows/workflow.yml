@@ -1,6 +1,9 @@
 # Basic Go workflow
+# Runs tests on the directories specified below
 #
-on: [push]
+name: workflow
+
+on: [push, pull_request]
 
 jobs:
   build:
