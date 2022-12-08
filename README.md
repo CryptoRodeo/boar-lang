@@ -27,6 +27,7 @@ Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbo
   - evaluate multiple lines
   - user input history
   - syntax highlighting
+  - suggestions
   - exit typing `exit()`
 - Base project refactors
 - Additional dev notes for each interpreter component
