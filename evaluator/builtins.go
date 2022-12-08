@@ -1,8 +1,8 @@
 package evaluator
 
 import (
+	"boar/object"
 	"fmt"
-	"monkey/object"
 )
 
 type ErrorFormatter struct {
@@ -124,7 +124,7 @@ func __rest__(args ...object.Object) object.Object {
 
 /**
 - Returns a new array with the pushed element at the end.
-- Arrays are immutable in monke-lang, so it doesn't modify the given array
+- Arrays are immutable in boar-lang, so it doesn't modify the given array
 **/
 func __push__(args ...object.Object) object.Object {
 	err := checkForArrayErrors(ErrorFormatter{FuncName: "push", ArgumentsExpected: 2, Arguments: args})

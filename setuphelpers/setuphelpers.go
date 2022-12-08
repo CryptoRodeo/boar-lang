@@ -1,16 +1,16 @@
 package setuphelpers
 
 import (
+	"boar/evaluator"
+	"boar/object"
 	"bytes"
 	"io"
-	"monkey/evaluator"
-	"monkey/object"
 	"strings"
 
 	"github.com/TwiN/go-color"
 )
 
-const MONKE = `🙈`
+const BOAR = `🐗`
 
 func LoadBuiltInMethods(env *object.Environment) {
 	for key, value := range evaluator.BUILTIN {
@@ -19,7 +19,7 @@ func LoadBuiltInMethods(env *object.Environment) {
 }
 
 func PrintParserErrors(out io.Writer, errors []string) {
-	io.WriteString(out, "\n"+MONKE+" Error!:\n")
+	io.WriteString(out, "\n"+BOAR+" Error!:\n")
 	for _, msg := range errors {
 		io.WriteString(out, "> "+msg+"\n\n")
 	}

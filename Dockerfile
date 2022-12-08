@@ -1,10 +1,10 @@
 FROM golang:1.18.0-buster
 
-ARG USER=monke
+ARG USER=boar
 ARG UID=1000
 ARG GID=1000
 # Default password for user
-ARG PW=monke
+ARG PW=boar
 
 WORKDIR /code
 
@@ -14,7 +14,7 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -v -o monke /code ./
+RUN go build -v -o boar /code ./
 
 RUN useradd -m ${USER} --uid=${UID} && echo "${USER}:${PW}" | chpasswd
 

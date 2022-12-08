@@ -1,10 +1,10 @@
 package object
 
 import (
+	"boar/ast"
 	"bytes"
 	"fmt"
 	"hash/fnv"
-	"monkey/ast"
 	"strings"
 )
 

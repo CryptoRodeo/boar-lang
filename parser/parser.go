@@ -1,10 +1,10 @@
 package parser
 
 import (
+	"boar/ast"
+	"boar/lexer"
+	"boar/token"
 	"fmt"
-	"monkey/ast"
-	"monkey/lexer"
-	"monkey/token"
 	"strconv"
 )
 
@@ -960,7 +960,7 @@ in the prefix position
 Postfix operator:
 - an operator "after" its operand.
 ex: 5++
-note: we won't have postfix operators in monke-lang (for now)
+note: we won't have postfix operators in boar-lang (for now)
 
 Infix Operators:
 - when the operator sits between its operands

@@ -1,7 +1,7 @@
 package lexer
 
 import (
-	"monkey/token"
+	"boar/token"
 )
 
 //Struct to read "tokens"
@@ -54,7 +54,7 @@ func (l *Lexer) readChar() {
 **/
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
-	// Ignore any whitespace found in the current char, (Monke-Lang doesn't add meaning to white spaces)
+	// Ignore any whitespace found in the current char, (Boar Lang doesn't add meaning to white spaces)
 	l.skipWhitespace()
 
 	// Read the char the lexer is currently on

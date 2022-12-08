@@ -1,9 +1,9 @@
 package evaluator
 
 import (
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
+	"boar/lexer"
+	"boar/object"
+	"boar/parser"
 	"testing"
 )
 
@@ -243,7 +243,7 @@ func TestErrorHandling(t *testing.T) {
 			"unknown operator: STRING - STRING",
 		},
 		{
-			`{"name": "Monkey"}[fn(x) { x }];`,
+			`{"name": "Boar"}[fn(x) { x }];`,
 			"unusable as hash key: FUNCTION",
 		},
 	}
