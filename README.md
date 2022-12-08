@@ -182,51 +182,51 @@ Hello World
 
 **Arrays:**
 ```
-::Creating an array
+#Creating an array
 ~> let x = [1,2,3]
 ~> x
 [1, 2, 3]
 
-::Adding to the array
+#Adding to the array
 ~> let y = push(x,4)
 ~> y
 [1, 2, 3, 4]
 
-::Array#len
+#Array::len
 ~> len(y)
 4
 ~> len(x)
 3
-::Array#len alternative
+#Array::len alternative
 ~> y.len()
 4
 
-::Array#first
+#Array::first
 ~> x.first()
 1
 
-::Array#last
+#Array::last
 ~> y.last()
 4
 
-::Array#[]
+#Array::[]
 ~> x[2]
 3
 
-::Array index assignment
+#Array index assignment
 ~> x[2] = "Hello!"
 Hello!
 ~> x
 [1, 2, Hello!]
 
-::Array#map
+#Array::map
 ~> let arr = [1,2,3]
 ~> let addTwo = fn(x) { x + 2; }
 ~> let res = arr.map(addTwo)
 ~> res
 [3, 4, 5]
 
-::Array#pop
+#Array::pop
 ~> let arr = [1,2,3]
 ~> let popVal = arr.pop()
 ~> arr
@@ -234,7 +234,7 @@ Hello!
 ~> popVal
 3
 
-::Array#shift
+#Array::shift
 ~> let tb = ["Tom", "Bombadil"]
 ~> let firstName = tb.shift()
 ~> firstName
@@ -242,7 +242,7 @@ Tom
 ~> tb
 [Bombadil]
 
-::Array#slice
+#Array::slice
 ~> let animals = ["ant", "bison", "camel", "duck", "elephant"];
 ~> animals.slice(2)
 [camel, duck, elephant]
@@ -254,39 +254,39 @@ Tom
 
 **Hash Maps:**
 ```
-::Creating a hash
+#Creating a hash
 ~> let person = { "name": "John", "age": (2*15) }
 ~> person
 {age: 30, name: John}
 
-::Hash#[]
+#Hash::[]
 ~> person["name"]
 John
 ~> person["age"]
 30
 
-::Hash Index/Key assignment
+#Hash Index/Key assignment
 ~> let USDrinkingAge = 21
 ~> person["age"] = USDrinkingAge
 21
 ~> person["age"]
 21
 
-::Hash#valuesAt
+#Hash::valuesAt
 ~> person.valuesAt("age", "name")
 [21, John]
 
-::Hash#toArray
+#Hash::toArray
 ~> person.toArray()
 [name, John, age, 21]
 
-::Hash#delete
+#Hash::delete
 ~> person.delete("age")
 {name: John, null: null}
 ~> person["age"]
 null
 
-::Hash#dig
+#Hash::dig
 ~> let person = { "name": "Tom Bombadil", "clothes": { "shoes": "yellow boots" } };
 ~> person.dig("clothes", "shoes")
 yellow boots
