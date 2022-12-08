@@ -1,10 +1,10 @@
 package main
 
 import (
+	"boar/file_eval"
+	"boar/repl"
 	"bytes"
 	"fmt"
-	"monkey/file_eval"
-	"monkey/repl"
 	"os"
 )
 
@@ -28,6 +28,6 @@ func main() {
 func printHelpMenu() {
 	var out bytes.Buffer
 	out.WriteString("--prompt to use the interpreter\n")
-	out.WriteString("-f FILE to evaluate a .mk file\n")
+	out.WriteString("-f FILE to evaluate a .br file\n")
 	fmt.Println(out.String())
 }

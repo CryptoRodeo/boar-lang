@@ -1,12 +1,12 @@
 package repl
 
 import (
+	"boar/evaluator"
+	"boar/lexer"
+	"boar/object"
+	"boar/parser"
+	"boar/setuphelpers"
 	"fmt"
-	"monkey/evaluator"
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
-	"monkey/setuphelpers"
 	"os"
 	"os/user"
 	"strings"
@@ -105,7 +105,7 @@ func printInterpreterPrompt() {
 }
 
 func printParserErrors(errors []string) {
-	fmt.Print("\n" + setuphelpers.MONKE + " Error!:\n")
+	fmt.Print("\n" + setuphelpers.BOAR + " Error!:\n")
 	for _, msg := range errors {
 		fmt.Print("> " + msg + "\n\n")
 		fmt.Println()

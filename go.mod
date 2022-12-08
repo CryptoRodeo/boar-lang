@@ -1,4 +1,4 @@
-module monkey
+module boar
 
 go 1.16
 

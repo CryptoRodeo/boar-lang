@@ -1,16 +1,23 @@
-# monke-lang
-> "[Reject humanity, return to monke](https://www.urbandictionary.com/define.php?term=Return+to+Monke)" 🐒
+# Boar lang 🐗
 
-Go-based language interpreter for a toy programming language called "monke" (pronounced "monk-eh")
+```
+                  #         
+          # # # # # #       
+      # # #         #       
+    # #             # # #   
+    #                 # # # 
+    # #   # # #   # # # #   
+    # # # # # # # # #       
+    # # #     # # # #       
+```
 
-![workflow](https://github.com/CryptoRodeo/monke-lang/actions/workflows/workflow.yml/badge.svg)
+Language interpreter for a toy programming, built in Go
 
-## Short Demo
-![monke-demo-gif](./monke-demo.gif)
+![workflow](https://github.com/CryptoRodeo/boar-lang/actions/workflows/workflow.yml/badge.svg)
 
 ## Details
 Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbook.com/) with some extra improvements, such as:
-- The ability to read and evaluate `.mk` code files (or trigger the REPL using `--prompt`)
+- The ability to read and evaluate `.br` code files (or trigger the REPL using `--prompt`)
 - Additional built in functions for the Hash and Array objects (inspired from other languages such as Ruby)
 - Standard Object#Function invocation: `someObject.someMethod()` as opposed to `someMethod(someObject)`
 - Variable reassignment (`let x = 3; x = "hello"` as opposed to `let x = 3; let x = "hello"`)
@@ -28,37 +35,37 @@ Based on ["Writing An Interpreter In Go" by Thorsten Ball](https://interpreterbo
 
 The recommended way is to use Docker:
 ```
-git clone git@github.com:CryptoRodeo/monke-lang.git
+git clone git@github.com:CryptoRodeo/boar-lang.git
 
-cd ./monke-lang
+cd ./boar-lang
 
-docker build . -t monke-lang
+docker build . -t boar-lang
 
-docker run -it --name="monke-lang" monke-lang
+docker run -it --name="boar-lang" boar-lang
 
-# To start the prompt type './monke --prompt'
-$ ./monke --prompt
-Hello monke, (type 'exit()' to exit)
+# To start the prompt type './boar --prompt'
+$ ./boar --prompt
+Hello boar, (type 'exit()' to exit)
 ~> 
 
-# running an .mk file (a test file exists)
-$ ./monke -f ./test.mk
+# running an .br file (a test file exists)
+$ ./boar -f ./test.br
 
 ```
 
 You can also just run it regularly (requires go version >= 1.16):
 ```
 # Build executable
-go build -o monke
+go build -o boar
 
 # Running the prompt
-$ ./monke --prompt
+$ ./boar --prompt
 
 Hello kilgore, (type 'exit()' to exit)
 ~> 
 
-# Running a .mk file (a test file exists)
-$ ./monke -f ./test.mk
+# Running a .br file (a test file exists)
+$ ./boar -f ./test.br
 
 ```
 
@@ -115,12 +122,12 @@ Hello World
 ```
 ~> let x
 
-🙈 Error!:
+🐗 Error!:
 > expected next token to be =, got EOF instead
 
 ~> let arr = [1,2 
 
-🙈 Error!:
+🐗 Error!:
 > expected next token to be ], got EOF instead
 
 ~> 

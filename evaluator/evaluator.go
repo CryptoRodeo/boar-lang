@@ -1,9 +1,9 @@
 package evaluator
 
 import (
+	"boar/ast"
+	"boar/object"
 	"fmt"
-	"monkey/ast"
-	"monkey/object"
 )
 
 var (

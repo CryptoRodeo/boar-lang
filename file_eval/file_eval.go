@@ -1,14 +1,14 @@
 package file_eval
 
 import (
+	"boar/evaluator"
+	"boar/lexer"
+	"boar/object"
+	"boar/parser"
+	"boar/setuphelpers"
 	"io"
 	"io/ioutil"
 	"log"
-	"monkey/evaluator"
-	"monkey/lexer"
-	"monkey/object"
-	"monkey/parser"
-	"monkey/setuphelpers"
 	"os"
 	"path/filepath"
 )
@@ -49,7 +49,7 @@ func formatUserFilePathInput(filePath string) string {
 	var fullFilePath string
 	pwd, _ := os.Getwd()
 
-	// ./fileName.mk
+	// ./fileName.br
 	if filePath[0] == '.' && filePath[1] == '/' {
 		fullFilePath = filePath
 	} else {
@@ -59,7 +59,7 @@ func formatUserFilePathInput(filePath string) string {
 	fileExtension, validFile := validateFileExtension(fullFilePath)
 
 	if !validFile {
-		log.Fatalf("Invalid file type passed, expected a .mk file, got %s instead", fileExtension)
+		log.Fatalf("Invalid file type passed, expected a .br file, got %s instead", fileExtension)
 	}
 
 	return fullFilePath
@@ -77,5 +77,5 @@ func findFile(filePath string) string {
 
 func validateFileExtension(fPath string) (string, bool) {
 	fileExtension := filepath.Ext(fPath)
-	return fileExtension, fileExtension == ".mk"
+	return fileExtension, fileExtension == ".br"
 }
