@@ -9,12 +9,11 @@ trigger:
 pool: Local
 
 steps:
+
 - script: |
-   echo Building Code
-   go build ./
+    bash ./misc/build.sh
   displayName: 'Build'
 
 - script: |
-    subjects=(parser lexer ast token evaluator object)
-    for subject in "${subjects[@]}"; do go test "./$subject"; done
+    bash ./misc/test.sh
   displayName: 'Test'
