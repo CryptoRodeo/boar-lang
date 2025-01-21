@@ -9,10 +9,12 @@ trigger:
 pool: Local
 
 steps:
-- script: echo Building Code
-  displayName: 'Run a one-line script'
+- script: |
+   echo Building Code
+   go build ./
+  displayName: 'Build'
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    subjects=(parser lexer ast token evaluator object)
+    for subject in "${subjects[@]}"; do go test "./$subject"; done
+  displayName: 'Test'
