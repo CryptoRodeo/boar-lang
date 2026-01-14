@@ -1,4 +1,4 @@
-FROM golang:1.18.0-buster
+FROM golang:1.20.5-buster
 
 ARG USER=boar
 ARG UID=1000
